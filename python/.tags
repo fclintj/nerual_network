@@ -1,0 +1,12 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
+mnist	deepnn.py	/^mnist = input_data.read_data_sets(".\/data") # or wherever you want$/;"	v
+print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
+softmax	deepnn.py	/^def softmax(x):$/;"	f
+x	deepnn.py	/^x = softmax(z)$/;"	v
+z	deepnn.py	/^z = [1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0]$/;"	v
