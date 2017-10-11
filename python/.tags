@@ -4,29 +4,49 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
+Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
 __init__	deepnn.py	/^    def __init__(self, num_neurons, num_inputs, activation):$/;"	m	class:layer
 __init__	deepnn.py	/^    def __init__(self, num_outputs, layers, output_layer, momentum):$/;"	m	class:neural_network
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,sigma):$/;"	m	class:neuron
 __layer_opperations	deepnn.py	/^    def __layer_opperations(self,X,layers):$/;"	m	class:neural_network	file:
 __set_layer_sigma	deepnn.py	/^    def __set_layer_sigma(self):$/;"	m	class:neural_network	file:
+accuracy	tensor_flow.py	/^accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))$/;"	v
 activation_function	deepnn.py	/^class activation_function:$/;"	c
 backward_prop	deepnn.py	/^    def backward_prop(self,x,yhat,y):$/;"	m	class:neural_network
+batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
+biases	tensor_flow.py	/^biases = {$/;"	v
+correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
-find_neuron_derivative	deepnn.py	/^    def find_neuron_derivative(self):$/;"	m	class:layer
+display_step	tensor_flow.py	/^display_step = 1$/;"	v
+find_neuron_derivatives	deepnn.py	/^    def find_neuron_derivatives(self):$/;"	m	class:layer
 forward_prop	deepnn.py	/^    def forward_prop(self, data):$/;"	m	class:neural_network
 function	deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
 get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
 hidden_layers	deepnn.py	/^hidden_layers = [layer0, layer1]$/;"	v
+init	tensor_flow.py	/^init = tf.global_variables_initializer()$/;"	v
 layer	deepnn.py	/^class layer:$/;"	c
 layer0	deepnn.py	/^layer0 = layer(2,num_inputs,sigmoid)$/;"	v
 layer1	deepnn.py	/^layer1 = layer(2,layer0.num_neurons,sigmoid)$/;"	v
+learning_rate	tensor_flow.py	/^learning_rate = 0.0$/;"	v
+logits	tensor_flow.py	/^logits = neural_net(X)$/;"	v
+loss_op	tensor_flow.py	/^loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits($/;"	v
+mnist	tensor_flow.py	/^mnist = input_data.read_data_sets("\/tmp\/data\/", one_hot=True)$/;"	v
 momentum	deepnn.py	/^momentum = None$/;"	v
+n_hidden_1	tensor_flow.py	/^n_hidden_1 = 2 # 1st layer number of neurons$/;"	v
+n_hidden_2	tensor_flow.py	/^n_hidden_2 = 2 # 2nd layer number of neurons$/;"	v
 network	deepnn.py	/^network = neural_network(num_outputs,hidden_layers,softmax,momentum)$/;"	v
+neural_net	tensor_flow.py	/^def neural_net(x):$/;"	f
 neural_network	deepnn.py	/^class neural_network:$/;"	c
 neuron	deepnn.py	/^class neuron:$/;"	c
+num_classes	tensor_flow.py	/^num_classes = 2 # MNIST total classes (0-9 digits)$/;"	v
+num_input	tensor_flow.py	/^num_input = 2 # MNIST data input (img shape: 28*28)$/;"	v
 num_inputs	deepnn.py	/^num_inputs = 2 $/;"	v
 num_outputs	deepnn.py	/^num_outputs = 2$/;"	v
+num_steps	tensor_flow.py	/^num_steps = 1$/;"	v
+optimizer	tensor_flow.py	/^optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)$/;"	v
+prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
 print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
 repot_error	deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
 sigmoid	deepnn.py	/^sigmoid = activation_function(sigmoid_func,sigmoid_derivative)$/;"	v
@@ -36,5 +56,7 @@ softmax	deepnn.py	/^softmax = activation_function(softmax_func,softmax_func)$/;"
 softmax_derivative	deepnn.py	/^def softmax_derivative(x):$/;"	f
 softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
 train_network	deepnn.py	/^    def train_network(self, x, y):$/;"	m	class:neural_network
+train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v
+weights	tensor_flow.py	/^weights = {$/;"	v
 x	deepnn.py	/^x = [0.05, 0.1]$/;"	v
 y	deepnn.py	/^y = [0.01, 0.99]$/;"	v
