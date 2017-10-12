@@ -3,6 +3,51 @@ import numpy as np
 import math
 from   tensorflow.examples.tutorials.mnist import input_data
 
+def main():
+    num_inputs = 2 
+    num_outputs = 2
+    batch_size = 9000 
+    epochs = 10
+    momentum = 0.5 
+
+    # create the sigmoid activation function
+    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
+    softmax = activation_function(softmax_func,softmax_func)
+
+    # create layer structure
+    layer0 = layer(2,num_inputs,sigmoid)
+    layer1 = layer(2,layer0.num_neurons,sigmoid)
+    hidden_layers = [layer0, layer1]
+
+    # create neural network framework
+    network = neural_network(num_outputs,hidden_layers,softmax,momentum)
+
+    x = [[0.05, 0.1],
+         [0.08, 0.2]]
+
+    y = [[0.00, 1 ],
+         [0.00, 1 ]]
+
+    network.train_network(x,y,batch_size,epochs)
+
+    # create testing initial parameters
+    # network.layers[0].neurons[0].current_weight[0] = 0.35
+    # network.layers[0].neurons[0].current_weight[1] = 0.15
+    # network.layers[0].neurons[0].current_weight[2] = 0.20
+    #
+    # network.layers[0].neurons[1].current_weight[0] = 0.35
+    # network.layers[0].neurons[1].current_weight[1] = 0.25
+    # network.layers[0].neurons[1].current_weight[2] = 0.30
+    #
+    # network.layers[1].neurons[0].current_weight[0] = 0.60
+    # network.layers[1].neurons[0].current_weight[1] = 0.40
+    # network.layers[1].neurons[0].current_weight[2] = 0.45
+    #
+    # network.layers[1].neurons[1].current_weight[0] = 0.60
+    # network.layers[1].neurons[1].current_weight[1] = 0.50
+    # network.layers[1].neurons[1].current_weight[2] = 0.55
+
+
 def get_ordered(X_train):
     ordered = [ 
             X_train[7] , # 0 
@@ -62,67 +107,26 @@ class neural_network:
         self.layers = layers
         self.momentum = momentum
         self.output_layer = output_layer
+        self.total_error = None
         self.__set_layer_sigma()
 
     def __set_layer_sigma(self):
-        # set up initial guesses for first layer
-        self.layers[0].sigma = np.sqrt(float(2) /
-            (self.layers[0].num_inputs + self.layers[1].num_inputs))
-
         # set initial guesses for hidden layers - 1
-        for i in range(1,len(self.layers)-1):
+        for i in range(len(self.layers)-1):
             self.layers[i].sigma = np.sqrt(float(2) /
             (self.layers[i].num_inputs + self.layers[i+1].num_inputs))
+            for j in range(self.layers[i].num_neurons):
+                self.layers[i].neurons[j].current_weight = np.random.normal(0,self.layers[i].sigma,[self.layers[i].num_inputs+1,1])
 
         # set initial guesses for last hidden layer
-        self.layers[len(self.layers)-1].sigma = np.sqrt(float(2) /
-        (self.layers[len(self.layers)-1].num_inputs + self.num_outputs))
+        for j in range(self.layers[len(self.layers)-1].num_neurons):
+            self.layers[len(self.layers)-1].neurons[j].current_weight = np.random.normal(0,self.layers[i].sigma,[self.layers[len(self.layers)-1].num_inputs+1,1])
 
-    def backward_prop(self,x,yhat,y):
-        eta = 0.5
-        der_out = yhat-y
 
-        # get derivatives for all layers
+    def __update_weights(self):
         for layer in self.layers:
-            layer.find_neuron_derivatives()
-
-
-        # find weights for last layer
-        for i in range(self.num_layers-1,-1,-1):
-            for j in range(self.layers[i].num_neurons):
-                for k in range(len(self.layers[i].neurons[0].current_weight)):
-                    der_neur = self.layers[i].neurons[0].weight_der[k]*self.layers[i].neurons[j].derivative*der_out[j]
-
-                    self.layers[i].neurons[j].new_weight[k] = self.layers[i].neurons[j].current_weight[k] - eta * der_neur
-
-        # find derivative of total output error with respect to penultimate layer
-        der_err_tot = 0
-        for i in range(len(der_out)):
-            der_err_tot += self.layers[self.num_layers-1].neurons[i].current_weight[1]*self.layers[self.num_layers-1].neurons[i].derivative*der_out[i]
-
-        # 
-        for i in range(self.layers[0].num_neurons):
-            for j in range(2):
-                der_neur = self.layers[0].neurons[i].derivative*self.layers[0].neurons[i].weight_der[j+1]*der_err_tot
-
-                self.layers[0].neurons[i].new_weight[j+1] = self.layers[0].neurons[i].current_weight[j+1] - eta * der_neur
-
-        print("\n")
-        print(self.layers[0].neurons[0].new_weight[0])
-        print(self.layers[0].neurons[0].new_weight[1])
-        print(self.layers[0].neurons[0].new_weight[2])
-        print(self.layers[0].neurons[1].new_weight[0])
-        print(self.layers[0].neurons[1].new_weight[1])
-        print(self.layers[0].neurons[1].new_weight[2])
-
-        print("Total derivative %f"%(der_err_tot))
-
-    def train_network(self, x, y):
-        yhat = np.array(self.forward_prop(x))
-        y = np.array(y).reshape((len(y),1))
-        error = 0.5*(yhat - y)*(yhat - y)
-        self.backward_prop(x,yhat,y)
-        print("Total error: %f"%(sum(error)))
+            for neuron in layer.neurons:
+                neuron.current_weight = neuron.new_weight
 
     def __layer_opperations(self,X,layers):
         for neuron in layers.neurons:
@@ -132,6 +136,53 @@ class neural_network:
         
         output = [layers.neurons[i].output for i in range(layers.num_neurons)]
         return output
+
+    def backward_prop(self,x,yhat,y):
+        eta = 1 
+        der_out = yhat-y
+
+        # get derivatives for all layers
+        for layer in self.layers:
+            layer.find_neuron_derivatives()
+
+        # find weights for last layer
+        for j in range(self.layers[self.num_layers-1].num_neurons):
+            for k in range(len(self.layers[self.num_layers-1].neurons[0].current_weight)):
+                der_neur = self.layers[self.num_layers-1].neurons[0].weight_der[k] * self.layers[self.num_layers-1].neurons[j].derivative*der_out[j]
+
+                self.layers[self.num_layers-1].neurons[j].new_weight[k] = self.layers[self.num_layers-1].neurons[j].current_weight[k] - eta * der_neur
+
+        # find derivative of total output error with respect to penultimate layer
+        der_err_tot = 0
+        for i in range(len(der_out)):
+            der_err_tot += self.layers[self.num_layers-1].neurons[i].current_weight[1] * self.layers[self.num_layers-1].neurons[i].derivative*der_out[i]
+
+         
+        # find derivative of total output error with respect to weights in hidden layers 
+        for i in range(self.num_layers-2,-1,-1):
+            for j in range(self.layers[i].num_neurons):
+                for k in range(len(self.layers[i].neurons[0].current_weight)):
+                    der_neur = self.layers[i].neurons[j].derivative * self.layers[i].neurons[j].weight_der[k] * der_err_tot
+
+                    # update new weight
+                    self.layers[i].neurons[j].new_weight[k] = self.layers[i].neurons[j].current_weight[k] - eta * der_neur
+
+            # calculate new total multiplicative derivative for next layer
+            der_err_tot *= self.layers[i].neurons[0].weight_der[1]
+        self.__update_weights()
+
+    def train_network(self, x, y, batch_size, epochs):
+        batch = np.random.randint(0,len(x),batch_size)
+        for i in range(epochs):
+            for sample in batch:
+                self.train_data(x[sample],y[sample]) 
+            print("Total error: %f"%(sum(self.total_error)))
+
+    def train_data(self, x, y):
+        yhat = np.array(self.forward_prop(x))
+        y = np.array(y).reshape((len(y),1))
+        self.backward_prop(x,yhat,y)
+        self.total_error = 0.5*(yhat - y)*(yhat - y)
 
     def forward_prop(self, data):
         X = [1] + data
@@ -150,7 +201,6 @@ class layer:
         self.num_inputs = num_inputs
         self.sigma = None
         self.activation = activation
-
         self.neurons = [neuron(self.num_inputs,self.sigma) 
                 for i in range(self.num_neurons)]
 
@@ -160,56 +210,12 @@ class layer:
 
 class neuron:
     def __init__(self,num_inputs,sigma):
-        self.output = None
-        self.net = None
-        self.weight_der = None
-        self.current_weight = np.random.normal(0,sigma,[num_inputs+1,1])
+        self.output = 0 
+        self.net = 0 
+        self.weight_der = 0  
+        self.current_weight = [None]*(num_inputs+1) #np.random.normal(0,sigma,[num_inputs+1,1])
         self.new_weight = [None]*(num_inputs+1)
         self.derivative = None
-             
 
-num_inputs = 2 
-num_outputs = 2
-momentum = None
-
-# create the sigmoid activation function
-sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
-softmax = activation_function(softmax_func,softmax_func)
-
-# create layer structure
-layer0 = layer(2,num_inputs,sigmoid)
-layer1 = layer(2,layer0.num_neurons,sigmoid)
-hidden_layers = [layer0, layer1]
-
-# create neural network framework
-network = neural_network(num_outputs,hidden_layers,softmax,momentum)
-
-# create testing initial parameters
-network.layers[0].neurons[0].current_weight[0] = 0.35
-network.layers[0].neurons[0].current_weight[1] = 0.15
-network.layers[0].neurons[0].current_weight[2] = 0.20
-
-network.layers[0].neurons[1].current_weight[0] = 0.35
-network.layers[0].neurons[1].current_weight[1] = 0.25
-network.layers[0].neurons[1].current_weight[2] = 0.30
-
-network.layers[1].neurons[0].current_weight[0] = 0.60
-network.layers[1].neurons[0].current_weight[1] = 0.40
-network.layers[1].neurons[0].current_weight[2] = 0.45
-
-network.layers[1].neurons[1].current_weight[0] = 0.60
-network.layers[1].neurons[1].current_weight[1] = 0.50
-network.layers[1].neurons[1].current_weight[2] = 0.55
-
-x = [0.05, 0.1]
-y = [0.01, 0.99]
-network.train_network(x,y)
-
-# print("\n")
-# print(network.layers[0].neurons[0].output)
-# print(network.layers[0].neurons[1].output)
-# print("\n")
-# print(network.layers[1].neurons[0].output)
-# print(network.layers[1].neurons[1].output)
-
-# print(network.layers[0].neurons[0].derivative)
+if __name__ == '__main__':
+  main()
