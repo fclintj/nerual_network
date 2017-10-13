@@ -6,11 +6,11 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
 Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
-__init__	deepnn.py	/^    def __init__(self, num_neurons, num_inputs, activation):$/;"	m	class:layer
 __init__	deepnn.py	/^    def __init__(self, num_outputs, layers, output_layer, momentum):$/;"	m	class:neural_network
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
+__init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __init__	deepnn.py	/^    def __init__(self,num_inputs,sigma):$/;"	m	class:neuron
-__layer_opperations	deepnn.py	/^    def __layer_opperations(self,X,layers):$/;"	m	class:neural_network	file:
+__layer_opperations	deepnn.py	/^    def __layer_opperations(self,X,layer):$/;"	m	class:neural_network	file:
 __set_layer_sigma	deepnn.py	/^    def __set_layer_sigma(self):$/;"	m	class:neural_network	file:
 __update_weights	deepnn.py	/^    def __update_weights(self):$/;"	m	class:neural_network	file:
 accuracy	tensor_flow.py	/^accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))$/;"	v
@@ -18,6 +18,7 @@ activation_function	deepnn.py	/^class activation_function:$/;"	c
 backward_prop	deepnn.py	/^    def backward_prop(self,x,yhat,y):$/;"	m	class:neural_network
 batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
 biases	tensor_flow.py	/^biases = {$/;"	v
+categorize_data	deepnn.py	/^    def categorize_data(self, x):$/;"	m	class:neural_network
 correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
 display_step	tensor_flow.py	/^display_step = 1$/;"	v
@@ -44,11 +45,13 @@ optimizer	tensor_flow.py	/^optimizer = tf.train.AdamOptimizer(learning_rate=lear
 prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
 print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
 repot_error	deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
+return_value	deepnn.py	/^def return_value(x):$/;"	f
 sigmoid_derivative	deepnn.py	/^def sigmoid_derivative(x):$/;"	f
 sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
-softmax_derivative	deepnn.py	/^def softmax_derivative(x):$/;"	f
-softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
+softmax_derivative	deepnn.py	/^def softmax_derivative(x,all_data):$/;"	f
+softmax_func	deepnn.py	/^def softmax_func(x,all_data):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, x, y):$/;"	m	class:neural_network
 train_network	deepnn.py	/^    def train_network(self, x, y, batch_size, epochs):$/;"	m	class:neural_network
 train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v
 weights	tensor_flow.py	/^weights = {$/;"	v
+write_network_values	deepnn.py	/^    def write_network_values(self, filename):$/;"	m	class:neural_network

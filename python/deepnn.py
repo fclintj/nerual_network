@@ -1,54 +1,48 @@
+# Clint Ferrin
+# Oct 12, 2017
+# Neural Network Classifier
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import pickle
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
+    # data = np.loadtxt("../data/classasgntrain1.dat",dtype=float)
     num_inputs = 2 
     num_outputs = 2
-    batch_size = 90 
+    batch_size = 1500
     epochs = 10
     momentum = 0.9 
 
     # create the sigmoid activation function
     sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
-    softmax = activation_function(softmax_func,softmax_func)
+    softmax = activation_function(softmax_func,softmax_derivative)
+    no_activation = activation_function(return_value,return_value)
 
     # create layer structure
-    neurons = 2
-    layer0 = layer(neurons,num_inputs,sigmoid)
-    layer1 = layer(2,layer0.num_neurons,sigmoid)
-    
+    layer0 = layer(num_inputs,5,sigmoid)
+    layer1 = layer(5,2,sigmoid)
     hidden_layers = [layer0, layer1]
+    # network = pickle.load(open("./test_network.p","rb"))
+
+    x = np.array(
+        [[0.10, 0.05],
+         [0.03, 0.1],
+         [0.07, 0.3],
+         [0.02, 0.4]])
+
+    y = np.array(
+        [[0, 1],
+         [1, 0],
+         [1, 0],
+         [1, 0]])
 
     # create neural network framework
     network = neural_network(num_outputs,hidden_layers,softmax,momentum)
-
-    x = [[0.05, 0.1],
-         [0.08, 0.2]]
-
-    y = [[0.00, 1 ],
-         [0.00, 1 ]]
-
     network.train_network(x,y,batch_size,epochs)
-
-    # create testing initial parameters
-    # network.layers[0].neurons[0].current_weight[0] = 0.35
-    # network.layers[0].neurons[0].current_weight[1] = 0.15
-    # network.layers[0].neurons[0].current_weight[2] = 0.20
-    #
-    # network.layers[0].neurons[1].current_weight[0] = 0.35
-    # network.layers[0].neurons[1].current_weight[1] = 0.25
-    # network.layers[0].neurons[1].current_weight[2] = 0.30
-    #
-    # network.layers[1].neurons[0].current_weight[0] = 0.60
-    # network.layers[1].neurons[0].current_weight[1] = 0.40
-    # network.layers[1].neurons[0].current_weight[2] = 0.45
-    #
-    # network.layers[1].neurons[1].current_weight[0] = 0.60
-    # network.layers[1].neurons[1].current_weight[1] = 0.50
-    # network.layers[1].neurons[1].current_weight[2] = 0.55
-
+    print(network.categorize_data(x))
 
 def get_ordered(X_train):
     ordered = [ 
@@ -76,14 +70,17 @@ def print_images(ordered,m,n):
 
     plt.show()
 
-def softmax_func(x):
+def return_value(x):
+    return x
+
+def softmax_func(x,all_data):
     x_exp = [math.exp(i) for i in x]
     sum_x_exp = sum(x_exp)
     softmax = [i / sum_x_exp for i in x_exp]
     return softmax 
 
-def softmax_derivative(x):
-    return x*(1-x)
+def softmax_derivative(x,all_data):
+    return (x*(1-x))
 
 def sigmoid_func(x):
     return 1/(1+np.exp(-x))
@@ -130,16 +127,16 @@ class neural_network:
                 for k in range(len(self.layers[i].neurons[j].current_weight)):
                    self.layers[i].neurons[j].current_weight[k] = self.layers[i].neurons[j].new_weight[k]
 
-    def __layer_opperations(self,X,layers):
-        for i in range(layers.num_inputs):
-            layers.neurons[i].weight_der = X
-            # print(layers.neurons[i].current_weight)
-            layers.neurons[i].net = np.dot(X.T,layers.neurons[i].current_weight)
-            layers.neurons[i].output = layers.activation.function(layers.neurons[i].net)
+    def __layer_opperations(self,X,layer):
+        for i in range(layer.num_neurons):
+            for j in range(X.shape[0]):
+                layer.neurons[i].weight_der[j] = X[j]
+            layer.neurons[i].net = np.dot(X.T,layer.neurons[i].current_weight)
+            layer.neurons[i].output = layer.activation.function(layer.neurons[i].net)
 
-        output = np.empty([layers.num_neurons,1]) 
-        for i in range(layers.num_neurons):
-            output[i] = layers.neurons[i].output
+        output = np.empty([layer.num_neurons,1]) 
+        for i in range(layer.num_neurons):
+            output[i] = layer.neurons[i].output
         return output
 
     def backward_prop(self,x,yhat,y):
@@ -202,13 +199,25 @@ class neural_network:
             layer_input = np.r_[[[1]],layer_input]
             layer_input = self.__layer_opperations(layer_input,self.layers[i])
         return np.array(layer_input).reshape(len(layer_input))
+    
+    def categorize_data(self, x):
+        output = np.empty([x.shape[0],1]) 
+        for i in range(x.shape[0]):
+            prob = self.forward_prop(x[i,:])
+            # print(prob)
+            output[i] = np.argmax(prob) 
+        return output 
 
     def repot_error(self, yhat, y):
         # TODO: write a function that compares categorized data to actual output
         print("verify accuracy")
 
+    def write_network_values(self, filename):
+        pickle.dump(self, open(filename, "wb"))
+        print("Network written to: %s" %(filename))
+
 class layer:
-    def __init__(self, num_neurons, num_inputs, activation):
+    def __init__(self,num_inputs,num_neurons, activation):
         self.num_neurons = num_neurons
         self.num_inputs = num_inputs
         self.sigma = None
@@ -224,7 +233,7 @@ class neuron:
     def __init__(self,num_inputs,sigma):
         self.output = 0 
         self.net = 0 
-        self.weight_der = 0  
+        self.weight_der = [None]*(num_inputs+1)  
         self.current_weight = [None]*(num_inputs+1) #np.random.normal(0,sigma,[num_inputs+1,1])
         self.new_weight = [None]*(num_inputs+1)
         self.derivative = None
