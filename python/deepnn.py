@@ -9,40 +9,124 @@ import pickle
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
-    # data = np.loadtxt("../data/classasgntrain1.dat",dtype=float)
-    num_inputs = 2 
-    num_outputs = 2
-    batch_size = 1500
-    epochs = 10
-    momentum = 0.9 
+    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    x0 = data[:,0:2]
+    x1 = data[:,2:4]
+    data = data_frame(x0,x1)
+    #
+    # num_inputs = 2 
+    # num_outputs = 2
+    # batch_size = 5000
+    # epochs = 10
+    # momentum = 0.9 
+    #
+    # # create the sigmoid activation function
+    # sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
+    # softmax = activation_function(softmax_func,softmax_derivative)
+    # no_activation = activation_function(return_value,return_value)
+    #
+    # # create layer structure
+    # layer0 = layer(num_inputs,5,sigmoid)
+    # layer1 = layer(5,2,sigmoid)
+    # hidden_layers = [layer0, layer1]
+    network = pickle.load(open("./classasgntrain1.p","rb"))
 
-    # create the sigmoid activation function
-    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
-    softmax = activation_function(softmax_func,softmax_derivative)
-    no_activation = activation_function(return_value,return_value)
-
-    # create layer structure
-    layer0 = layer(num_inputs,5,sigmoid)
-    layer1 = layer(5,2,sigmoid)
-    hidden_layers = [layer0, layer1]
-    # network = pickle.load(open("./test_network.p","rb"))
-
-    x = np.array(
-        [[0.10, 0.05],
-         [0.03, 0.1],
-         [0.07, 0.3],
-         [0.02, 0.4]])
-
-    y = np.array(
-        [[0, 1],
-         [1, 0],
-         [1, 0],
-         [1, 0]])
+    # x = np.array(
+    #     [[0.10, 0.05],
+    #      [0.03, 0.1],
+    #      [0.07, 0.3],
+    #      [0.02, 0.4]])
+    #
+    # y = np.array(
+    #     [[0, 1],
+    #      [1, 0],
+    #      [1, 0],
+    #      [1, 0]])
 
     # create neural network framework
-    network = neural_network(num_outputs,hidden_layers,softmax,momentum)
-    network.train_network(x,y,batch_size,epochs)
-    print(network.categorize_data(x))
+    # network = neural_network(num_outputs,hidden_layers,softmax,momentum)
+    # network.train_network(data.xtot,data.class_tot,batch_size,epochs)
+    # network.write_network_values("classasgntrain1.p")
+
+    # yhat = network.categorize_data(data.xtot)
+    # y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
+    # num_err = sum(abs(yhat - y))
+    # print("Percent of errors: %.4f"%(float(num_err)/data.N))
+     
+    test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
+    yhat = network.categorize_data(test_data.xtot)
+    num_err = sum(abs(yhat - test_data.y))
+    print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
+
+    plot_boundaries(data,network.forward_prop) 
+
+    
+def plot_data(data):
+    fig = plt.figure() # make handle to save plot 
+    plt.scatter(data.x0[:,0],data.x0[:,1],c='red',label='$x_0$')
+    plt.scatter(data.x1[:,0],data.x1[:,1],c='blue',label='$x_1$')
+    plt.xlabel('X Coordinate') 
+    plt.ylabel('Y Coordinate') 
+    plt.legend()
+
+def plot_boundaries(data,equation):
+    xp1 = np.linspace(data.xlim[0],data.xlim[1], num=100)
+    yp1 = np.linspace(data.ylim[0],data.ylim[1], num=100) 
+    
+    red_pts = np.array([[],[]])
+    blue_pts= np.array([[],[]])
+    for x in xp1:
+        for y in yp1:
+            prob = equation([x,y])
+            if prob[0] > prob[1]: 
+                blue_pts = np.c_[blue_pts,[x,y]]
+            else:
+                red_pts = np.c_[red_pts,[x,y]]
+
+    plot_data(data)
+    plt.scatter(blue_pts[0,:],blue_pts[1,:],color='blue',s=0.25)
+    plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
+    plt.xlim(data.xlim)
+    plt.ylim(data.ylim)
+    plt.show()
+
+
+def gendata2(class_type,N):
+    m0 = np.array(
+         [[-0.132,0.320,1.672,2.230,1.217,-0.819,3.629,0.8210,1.808, 0.1700],
+          [-0.711,-1.726,0.139,1.151,-0.373,-1.573,-0.243,-0.5220,-0.511,0.5330]])
+
+    m1 = np.array(
+          [[-1.169,0.813,-0.859,-0.608,-0.832,2.015,0.173,1.432,0.743,1.0328],
+          [ 2.065,2.441,0.247,1.806,1.286,0.928,1.923,0.1299,1.847,-0.052]])
+
+    x = np.array([[],[]])
+    for i in range(N):
+        idx = np.random.randint(10)
+        if class_type == 0:
+            m = m0[:,idx]
+        elif class_type == 1:
+            m = m1[:,idx]
+        else:
+            print("not a proper classifier")
+            return 0 
+        x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
+    return x.T
+
+class data_frame:
+    def __init__(self, data0, data1):
+        self.x0 = data0 
+        self.x1 = data1 
+        self.xtot = np.r_[self.x0,self.x1]
+        self.N0 = self.x0.shape[0]
+        self.N1 = self.x1.shape[0]
+        self.N = self.N0 + self.N1
+        self.xlim = [np.min(self.xtot[:,0]),np.max(self.xtot[:,0])]
+        self.ylim = [np.min(self.xtot[:,1]),np.max(self.xtot[:,1])]
+        class_x0 = np.c_[np.zeros([self.N0,1]),np.ones([self.N0,1])] 
+        class_x1 = np.c_[np.ones([self.N1,1]),np.zeros([self.N1,1])] 
+        self.class_tot = np.r_[class_x0,class_x1]
+        self.y = np.r_[np.ones([self.N0,1]),np.zeros([self.N1,1])] 
 
 def get_ordered(X_train):
     ordered = [ 
@@ -204,7 +288,6 @@ class neural_network:
         output = np.empty([x.shape[0],1]) 
         for i in range(x.shape[0]):
             prob = self.forward_prop(x[i,:])
-            # print(prob)
             output[i] = np.argmax(prob) 
         return output 
 

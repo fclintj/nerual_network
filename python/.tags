@@ -6,6 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
 Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
+__init__	deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
 __init__	deepnn.py	/^    def __init__(self, num_outputs, layers, output_layer, momentum):$/;"	m	class:neural_network
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
@@ -20,11 +21,13 @@ batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
 biases	tensor_flow.py	/^biases = {$/;"	v
 categorize_data	deepnn.py	/^    def categorize_data(self, x):$/;"	m	class:neural_network
 correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
+data_frame	deepnn.py	/^class data_frame:$/;"	c
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
 display_step	tensor_flow.py	/^display_step = 1$/;"	v
 find_neuron_derivatives	deepnn.py	/^    def find_neuron_derivatives(self):$/;"	m	class:layer
 forward_prop	deepnn.py	/^    def forward_prop(self, data):$/;"	m	class:neural_network
 function	deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
+gendata2	deepnn.py	/^def gendata2(class_type,N):$/;"	f
 get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
 init	tensor_flow.py	/^init = tf.global_variables_initializer()$/;"	v
 layer	deepnn.py	/^class layer:$/;"	c
@@ -42,6 +45,8 @@ num_classes	tensor_flow.py	/^num_classes = 2 # MNIST total classes (0-9 digits)$
 num_input	tensor_flow.py	/^num_input = 2 # MNIST data input (img shape: 28*28)$/;"	v
 num_steps	tensor_flow.py	/^num_steps = 1$/;"	v
 optimizer	tensor_flow.py	/^optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)$/;"	v
+plot_boundaries	deepnn.py	/^def plot_boundaries(data,equation):$/;"	f
+plot_data	deepnn.py	/^def plot_data(data):$/;"	f
 prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
 print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
 repot_error	deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
