@@ -19,7 +19,7 @@ activation_function	deepnn.py	/^class activation_function:$/;"	c
 backward_prop	deepnn.py	/^    def backward_prop(self,x,yhat,y):$/;"	m	class:neural_network
 batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
 biases	tensor_flow.py	/^biases = {$/;"	v
-categorize_data	deepnn.py	/^    def categorize_data(self, x):$/;"	m	class:neural_network
+classify_data	deepnn.py	/^    def classify_data(self, x):$/;"	m	class:neural_network
 correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
 data_frame	deepnn.py	/^class data_frame:$/;"	c
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
@@ -49,12 +49,14 @@ plot_boundaries	deepnn.py	/^def plot_boundaries(data,equation):$/;"	f
 plot_data	deepnn.py	/^def plot_data(data):$/;"	f
 prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
 print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
+print_weights	deepnn.py	/^    def print_weights(self):$/;"	m	class:neural_network
 repot_error	deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
 return_value	deepnn.py	/^def return_value(x):$/;"	f
+set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:neural_network
 sigmoid_derivative	deepnn.py	/^def sigmoid_derivative(x):$/;"	f
 sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
-softmax_derivative	deepnn.py	/^def softmax_derivative(x,all_data):$/;"	f
-softmax_func	deepnn.py	/^def softmax_func(x,all_data):$/;"	f
+softmax_respect_der	deepnn.py	/^def softmax_respect_der(y,x):$/;"	f
+stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, x, y):$/;"	m	class:neural_network
 train_network	deepnn.py	/^    def train_network(self, x, y, batch_size, epochs):$/;"	m	class:neural_network
 train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v

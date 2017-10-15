@@ -15,6 +15,9 @@ def main():
     epochs = 1 
     momentum = 0 
 
+    x = np.array([0.05,0.10]).reshape(2,1)
+    y = np.array([0, 1]).reshape(2,1)
+
 
     # create the sigmoid activation function
     sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
@@ -31,14 +34,9 @@ def main():
 
     network = neural_network(num_outputs,hidden_layers,softmax,momentum)
     network.set_initial_conditions()
-    x = np.array([0.05,0.10])
+    network.train_network(x,y,batch_size,epochs)
 
-    y = np.array([0, 1])
-
-    # print(network.forward_prop(x))
-    network.print_weights()
-    network.train_data(x,y)
-    network.print_weights()
+    print("test")
 
     # print(network.classify_data(x))
     # network.write_network_values("classasgntrain1.p")
