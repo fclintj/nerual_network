@@ -9,11 +9,110 @@ import pickle
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
+    test_bilinear()    
+    # test_number()
+    # softmax_test()
+    
+def softmax_test():
+    num_inputs = 2 
+    num_outputs = 2
+    batch_size = 1
+    epochs = 5000
+    momentum = 0 
+
+    # create the sigmoid activation function
+    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
+    softmax = activation_function(stable_softmax_func,softmax_respect_der)
+    no_activation = activation_function(return_value,return_value)
+
+    # create layer structure
+    layer0 = layer(num_inputs,2,sigmoid)
+    layer1 = layer(2,2,no_activation)
+    hidden_layers = [layer0, layer1]
+
+    # create neural network framework
+    # network = pickle.load(open("./classasgntrain1.p","rb"))
+
+
+    network = neural_network(num_outputs,hidden_layers,"softmax",momentum)
+    network.set_initial_conditions()
+    # x = np.array([0.05,0.10])
+    # y = np.array([0, 1])
+
+    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    x0 = data[:,0:2]
+    x1 = data[:,2:4]
+    data = data_frame(x0,x1)
+
+
+    # network.train_network(data.xtot,data.class_tot,batch_size,epochs)
+    print(data.class_tot)
+
+    network.backward_prop(data.xtot[i,:],network.forward_prop(data.xtot[i,:]),data.class_tot[i,:])
+
+    # print(network.train_data(data.xtot[0,:],data.class_tot[0,:]))
+    # print(network.classify_data(data.x0)) 
+
+    yhat = network.classify_data(data.xtot)
+    y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
+    num_err = sum(abs(yhat - y))
+    print("Percent of errors: %.4f"%(float(num_err)/data.N))
+
+    test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
+    yhat = network.classify_data(test_data.xtot)
+    num_err = sum(abs(yhat - test_data.y))
+    print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
+
+    plot_boundaries(data,network.forward_prop) 
+
+def test_bilinear():
+    num_inputs = 2 
+    num_outputs = 2
+    batch_size = 800
+    epochs = 5
+    momentum = 0.9 
+
+    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    x0 = data[:,0:2]
+    x1 = data[:,2:4]
+    data = data_frame(x0,x1)
+
+
+    # create the sigmoid activation function
+    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
+    no_activation = activation_function(return_value,return_value)
+
+    # create layer structure
+    layer0 = layer(num_inputs,2,sigmoid)
+    layer1 = layer(2,2,sigmoid)
+    hidden_layers = [layer0, layer1]
+    # network = pickle.load(open("./classasgntrain1.p","rb"))
+
+    # create neural network framework
+    network = neural_network(num_outputs,hidden_layers,"sigmoid",momentum)
+    network.train_network(data.xtot,data.class_tot,batch_size,epochs)
+    network.plot_error_array()
+    # network.write_network_values("classasgntrain1.p")
+
+    yhat = network.classify_data(data.xtot)
+    y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
+    num_err = sum(abs(yhat - y))
+    print("Percent of errors: %.4f"%(float(num_err)/data.N))
+
+    test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
+    yhat = network.classify_data(test_data.xtot)
+    num_err = sum(abs(yhat - test_data.y))
+    print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
+    
+
+    plot_boundaries(data,network.forward_prop) 
+
+def test_number():
     num_inputs = 2 
     num_outputs = 2
     batch_size = 5000
     epochs = 5 
-    momentum = 0 
+    momentum = 0
 
     # create the sigmoid activation function
     sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
@@ -48,9 +147,6 @@ def main():
     network.train_network(x,y,batch_size,epochs)
     print(network.classify_data(x))
 
-    # network.write_network_values("classasgntrain1.p")
-    
-    
 def plot_data(data):
     fig = plt.figure() # make handle to save plot 
     plt.scatter(data.x0[:,0],data.x0[:,1],c='red',label='$x_0$')
@@ -184,6 +280,7 @@ class neural_network:
         self.output_layer = output_layer
         self.total_error = None
         self.__set_layer_sigma()
+        self.error_array = [] 
 
     def __set_layer_sigma(self):
         for i in range(len(self.layers)-1):
@@ -222,7 +319,14 @@ class neural_network:
         for i in range(epochs):
             for sample in batch:
                 self.train_data(x[sample],y[sample]) 
+                if i%100 is 0:
+                    self.error_array.append(sum(self.total_error)) 
+
             print("Total error: %f"%(sum(self.total_error)))
+
+    def plot_error_array(self):
+        plt.plot(self.error_array) 
+        plt.show()
 
     def train_data(self, x, y):
         yhat = np.array(self.forward_prop(x))

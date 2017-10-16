@@ -55,7 +55,7 @@ I-1
 I0
 tp25
 bI00
-S'\x88aqU\xfeN\x12@'
+S'\x9b\x88Ru\x18\xe6Z\xc0'
 p26
 tp27
 bag13
@@ -71,7 +71,7 @@ I1
 tp31
 g23
 I00
-S'\xad\x92\xe6\xdb9s\xfd\xbf'
+S'\xa7\x89\xcfm\xf7\xfeW\xc0'
 p32
 tp33
 bag13
@@ -87,7 +87,7 @@ I1
 tp37
 g23
 I00
-S'8\xdd!\xe70\x0b0@'
+S'\xe0\x8et\xa0\x8b6T\xc0'
 p38
 tp39
 basS'weight_der'
@@ -120,7 +120,7 @@ Rp50
 tp51
 g23
 I00
-S'[\xb1\xbf\xec\x9e<\xf1\xbf'
+S'\xdd\xb5\x84|\xd0\xb3\xd1?'
 p52
 tp53
 bag13
@@ -135,7 +135,7 @@ Rp56
 tp57
 g23
 I00
-S'\x80H\xbf}\x1d8\xf6?'
+S'\xcb\xa1E\xb6\xf3\xfd\x03@'
 p58
 tp59
 basS'output'
@@ -149,11 +149,10 @@ tp62
 Rp63
 (I1
 (I1
-I1
 tp64
 g23
 I00
-S'\x80\xf5\xff\xff\xff\xff\xef?'
+S'\x02q\x87\xec\xe1\xf1\xa8!'
 p65
 tp66
 bsS'derivative'
@@ -167,11 +166,10 @@ tp69
 Rp70
 (I1
 (I1
-I1
 tp71
 g23
 I00
-S'\x1c\xf9\xff\xff\xff\xffT='
+S'\x02q\x87\xec\xe1\xf1\xa8!'
 p72
 tp73
 bsS'net'
@@ -189,7 +187,7 @@ I1
 tp78
 g23
 I00
-S'\xbd\xc4\x7f\xb2\x07\xd7<@'
+S'\xf6c&\x84\xb7\xfbt\xc0'
 p79
 tp80
 bsS'current_weight'
@@ -207,7 +205,7 @@ I1
 tp85
 g23
 I00
-S'\x88aqU\xfeN\x12@\xad\x92\xe6\xdb9s\xfd\xbf8\xdd!\xe70\x0b0@'
+S'\x9b\x88Ru\x18\xe6Z\xc0\xa7\x89\xcfm\xf7\xfeW\xc0\xe0\x8et\xa0\x8b6T\xc0'
 p86
 tp87
 bsba(i__main__
@@ -229,7 +227,7 @@ I1
 tp94
 g23
 I00
-S'k\x8e\x0c\xb8\xea\x84"\xc0'
+S'\xa1\x80\xc7IK?S\xc0'
 p95
 tp96
 bag13
@@ -245,7 +243,7 @@ I1
 tp100
 g23
 I00
-S'\xcd\x8d&\xae\xcc\x90\xf5\xbf'
+S'\xf1\xbf\xec\x1e\xf6\xa1Q\xc0'
 p101
 tp102
 bag13
@@ -261,7 +259,7 @@ I1
 tp106
 g23
 I00
-S'\r\x85}(\x807\x1c@'
+S'96\x1aRM\xdfK\xc0'
 p107
 tp108
 basg40
@@ -293,7 +291,7 @@ Rp118
 tp119
 g23
 I00
-S'[\xb1\xbf\xec\x9e<\xf1\xbf'
+S'\xdd\xb5\x84|\xd0\xb3\xd1?'
 p120
 tp121
 bag13
@@ -308,7 +306,7 @@ Rp124
 tp125
 g23
 I00
-S'\x80H\xbf}\x1d8\xf6?'
+S'\xcb\xa1E\xb6\xf3\xfd\x03@'
 p126
 tp127
 basg60
@@ -321,11 +319,10 @@ tp129
 Rp130
 (I1
 (I1
-I1
 tp131
 g23
 I00
-S"\xde'\xf8E\xa5%\xec?"
+S't\xdcs\xe6\xe2\x9b\xb3*'
 p132
 tp133
 bsg67
@@ -338,11 +335,10 @@ tp135
 Rp136
 (I1
 (I1
-I1
 tp137
 g23
 I00
-S'\xaa\xd0\xf3\x0f\xbe\x1c\xbb?'
+S't\xdcs\xe6\xe2\x9b\xb3*'
 p138
 tp139
 bsg74
@@ -359,7 +355,7 @@ I1
 tp143
 g23
 I00
-S'\x98\xc9\x07\xd5R\xd1\xff?'
+S'vtx\xc1\xeenm\xc0'
 p144
 tp145
 bsg81
@@ -376,7 +372,7 @@ I1
 tp149
 g23
 I00
-S'k\x8e\x0c\xb8\xea\x84"\xc0\xcd\x8d&\xae\xcc\x90\xf5\xbf\r\x85}(\x807\x1c@'
+S'\xa1\x80\xc7IK?S\xc0\xf1\xbf\xec\x1e\xf6\xa1Q\xc096\x1aRM\xdfK\xc0'
 p150
 tp151
 bsba(i__main__
@@ -398,7 +394,7 @@ I1
 tp158
 g23
 I00
-S'\x1f\x94\x89\x04\xba\x92!\xc0'
+S'H\xb4d<\xcc\xb9M\xc0'
 p159
 tp160
 bag13
@@ -414,7 +410,7 @@ I1
 tp164
 g23
 I00
-S'\xce\xd4r[\x84\xd2$\xc0'
+S'a\x90\x9d$\xab\x9fI\xc0'
 p165
 tp166
 bag13
@@ -430,7 +426,7 @@ I1
 tp170
 g23
 I00
-S'\xf0\x0c\xb4E\xa64\x02\xc0'
+S'\xf9N\x9c\x04\x1a\xb3=\xc0'
 p171
 tp172
 basg40
@@ -462,7 +458,7 @@ Rp182
 tp183
 g23
 I00
-S'[\xb1\xbf\xec\x9e<\xf1\xbf'
+S'\xdd\xb5\x84|\xd0\xb3\xd1?'
 p184
 tp185
 bag13
@@ -477,7 +473,7 @@ Rp188
 tp189
 g23
 I00
-S'\x80H\xbf}\x1d8\xf6?'
+S'\xcb\xa1E\xb6\xf3\xfd\x03@'
 p190
 tp191
 basg60
@@ -490,11 +486,10 @@ tp193
 Rp194
 (I1
 (I1
-I1
 tp195
 g23
 I00
-S'\x96Q\x0f\xc3\xbf\xcc\xd4?'
+S'\x8b\x0eN\xfd\xbf\xa6\xa02'
 p196
 tp197
 bsg67
@@ -507,11 +502,10 @@ tp199
 Rp200
 (I1
 (I1
-I1
 tp201
 g23
 I00
-S'\xb4T\xd7\xc0q\x14\xcc?'
+S'\x8b\x0eN\xfd\xbf\xa6\xa02'
 p202
 tp203
 bsg74
@@ -528,7 +522,7 @@ I1
 tp207
 g23
 I00
-S'\x88C\xaf\xea\x8bc\xe7\xbf'
+S'\x00\x02?\xda6sb\xc0'
 p208
 tp209
 bsg81
@@ -545,7 +539,7 @@ I1
 tp213
 g23
 I00
-S'\x1f\x94\x89\x04\xba\x92!\xc0\xce\xd4r[\x84\xd2$\xc0\xf0\x0c\xb4E\xa64\x02\xc0'
+S'H\xb4d<\xcc\xb9M\xc0a\x90\x9d$\xab\x9fI\xc0\xf9N\x9c\x04\x1a\xb3=\xc0'
 p214
 tp215
 bsba(i__main__
@@ -567,7 +561,7 @@ I1
 tp222
 g23
 I00
-S'\xfb\xbd\x8e\x9f\xdcK"\xc0'
+S'\xeaUl\x82\xff\xc9C\xc0'
 p223
 tp224
 bag13
@@ -583,7 +577,7 @@ I1
 tp228
 g23
 I00
-S"\xac\x93}:rB'\xc0"
+S'@i\xd0\xe2`z:\xc0'
 p229
 tp230
 bag13
@@ -599,7 +593,7 @@ I1
 tp234
 g23
 I00
-S'\xd3E\x85\x8d\x00B\r@'
+S'\x08\xb1\xa4\xf8\xbf\x0e\n\xc0'
 p235
 tp236
 basg40
@@ -631,7 +625,7 @@ Rp246
 tp247
 g23
 I00
-S'[\xb1\xbf\xec\x9e<\xf1\xbf'
+S'\xdd\xb5\x84|\xd0\xb3\xd1?'
 p248
 tp249
 bag13
@@ -646,7 +640,7 @@ Rp252
 tp253
 g23
 I00
-S'\x80H\xbf}\x1d8\xf6?'
+S'\xcb\xa1E\xb6\xf3\xfd\x03@'
 p254
 tp255
 basg60
@@ -659,11 +653,10 @@ tp257
 Rp258
 (I1
 (I1
-I1
 tp259
 g23
 I00
-S'\xfc\xd9\xc5\xb3C\xfe\xef?'
+S'pPA\xea\x0b\xd6\xfc:'
 p260
 tp261
 bsg67
@@ -676,11 +669,10 @@ tp263
 Rp264
 (I1
 (I1
-I1
 tp265
 g23
 I00
-S'\xc7\x0c \x16B\xc3+?'
+S'pPA\xea\x0b\xd6\xfc:'
 p266
 tp267
 bsg74
@@ -697,7 +689,7 @@ I1
 tp271
 g23
 I00
-S'\x02\xec\x1d_4\xeb @'
+S'a\xee\xe1\x14nnK\xc0'
 p272
 tp273
 bsg81
@@ -714,7 +706,7 @@ I1
 tp277
 g23
 I00
-S'\xfb\xbd\x8e\x9f\xdcK"\xc0\xac\x93}:rB\'\xc0\xd3E\x85\x8d\x00B\r@'
+S'\xeaUl\x82\xff\xc9C\xc0@i\xd0\xe2`z:\xc0\x08\xb1\xa4\xf8\xbf\x0e\n\xc0'
 p278
 tp279
 bsba(i__main__
@@ -736,7 +728,7 @@ I1
 tp286
 g23
 I00
-S'\x10\xd8\xa9D\xa54#\xc0'
+S'G%u"\x85C\x19\xc0'
 p287
 tp288
 bag13
@@ -752,7 +744,7 @@ I1
 tp292
 g23
 I00
-S'\x93\x90\xab\x07\x0f%&\xc0'
+S'\x89p\xc7\x8ai\xde\x12\xc0'
 p293
 tp294
 bag13
@@ -768,7 +760,7 @@ I1
 tp298
 g23
 I00
-S'\x02-"k ,\x0b\xc0'
+S'C\x9c-\xfciv\x0b@'
 p299
 tp300
 basg40
@@ -800,7 +792,7 @@ Rp310
 tp311
 g23
 I00
-S'[\xb1\xbf\xec\x9e<\xf1\xbf'
+S'\xdd\xb5\x84|\xd0\xb3\xd1?'
 p312
 tp313
 bag13
@@ -815,7 +807,7 @@ Rp316
 tp317
 g23
 I00
-S'\x80H\xbf}\x1d8\xf6?'
+S'\xcb\xa1E\xb6\xf3\xfd\x03@'
 p318
 tp319
 basg60
@@ -828,11 +820,10 @@ tp321
 Rp322
 (I1
 (I1
-I1
 tp323
 g23
 I00
-S'X\xb5\xd6\xffGv\xb5?'
+S'$AbQ4\xf0\xe7?'
 p324
 tp325
 bsg67
@@ -845,11 +836,10 @@ tp327
 Rp328
 (I1
 (I1
-I1
 tp329
 g23
 I00
-S'\xc0ai\x89\xa9\xa9\xb3?'
+S'\x83\xe1*-x\x1f\xc8?'
 p330
 tp331
 bsg74
@@ -866,7 +856,7 @@ I1
 tp335
 g23
 I00
-S'F\x94y\x98r!\x03\xc0'
+S'pSN\xe2\xe6i\xf1?'
 p336
 tp337
 bsg81
@@ -883,7 +873,7 @@ I1
 tp341
 g23
 I00
-S'\x10\xd8\xa9D\xa54#\xc0\x93\x90\xab\x07\x0f%&\xc0\x02-"k ,\x0b\xc0'
+S'G%u"\x85C\x19\xc0\x89p\xc7\x8ai\xde\x12\xc0C\x9c-\xfciv\x0b@'
 p342
 tp343
 bsbasS'sigma'
@@ -941,7 +931,7 @@ I1
 tp365
 g23
 I00
-S'R?g\xb8\xb2a\x14\xc0'
+S'\x8b\xb3\x81\x97\xa8i\x85@'
 p366
 tp367
 bag13
@@ -957,7 +947,7 @@ I1
 tp371
 g23
 I00
-S'\x97NTi\x8e\x95\x10@'
+S'\xfd$\x13}{L\x8d@'
 p372
 tp373
 bag13
@@ -973,7 +963,7 @@ I1
 tp377
 g23
 I00
-S"z\x11'H\x0cs\x14@"
+S'\x98T\xc0\xaaNn\x92@'
 p378
 tp379
 bag13
@@ -989,7 +979,7 @@ I1
 tp383
 g23
 I00
-S'V\x90\xbb\x00\x85\x81\xf6?'
+S'\xf9\xa5#%\xb4\xf0\x96@'
 p384
 tp385
 bag13
@@ -1005,7 +995,7 @@ I1
 tp389
 g23
 I00
-S'\xc3\xdfp\xdf\x01!\x16@'
+S'\xea\x01\x85d\x94r\x9d@'
 p390
 tp391
 bag13
@@ -1021,7 +1011,7 @@ I1
 tp395
 g23
 I00
-S'\xd0MwH9m\x05\xc0'
+S'5\x9e\xc6\xd9\x8a\xb5\xa6@'
 p396
 tp397
 basg40
@@ -1053,7 +1043,7 @@ Rp407
 tp408
 g23
 I00
-S'\x80\xf5\xff\xff\xff\xff\xef?'
+S'\x02q\x87\xec\xe1\xf1\xa8!'
 p409
 tp410
 bag13
@@ -1068,7 +1058,7 @@ Rp413
 tp414
 g23
 I00
-S"\xde'\xf8E\xa5%\xec?"
+S't\xdcs\xe6\xe2\x9b\xb3*'
 p415
 tp416
 bag13
@@ -1083,7 +1073,7 @@ Rp419
 tp420
 g23
 I00
-S'\x96Q\x0f\xc3\xbf\xcc\xd4?'
+S'\x8b\x0eN\xfd\xbf\xa6\xa02'
 p421
 tp422
 bag13
@@ -1098,7 +1088,7 @@ Rp425
 tp426
 g23
 I00
-S'\xfc\xd9\xc5\xb3C\xfe\xef?'
+S'pPA\xea\x0b\xd6\xfc:'
 p427
 tp428
 bag13
@@ -1113,7 +1103,7 @@ Rp431
 tp432
 g23
 I00
-S'X\xb5\xd6\xffGv\xb5?'
+S'$AbQ4\xf0\xe7?'
 p433
 tp434
 basg60
@@ -1126,11 +1116,10 @@ tp436
 Rp437
 (I1
 (I1
-I1
 tp438
 g23
 I00
-S'\xddS\xc3gB\xff\xef?'
+S'\x00\x00\x00\x00\x00\x00\xf0?'
 p439
 tp440
 bsg67
@@ -1143,11 +1132,10 @@ tp442
 Rp443
 (I1
 (I1
-I1
 tp444
 g23
 I00
-S'\xbaA`+{\xb2\x17?'
+S'\x00\x00\x00\x00\x00\x00\x00\x00'
 p445
 tp446
 bsg74
@@ -1164,7 +1152,7 @@ I1
 tp450
 g23
 I00
-S'NJ6\x0eJ\x9f"@'
+S'\xdet\x9fx\\V\xa6@'
 p451
 tp452
 bsg81
@@ -1181,7 +1169,7 @@ I1
 tp456
 g23
 I00
-S"R?g\xb8\xb2a\x14\xc0\x97NTi\x8e\x95\x10@z\x11'H\x0cs\x14@V\x90\xbb\x00\x85\x81\xf6?\xc3\xdfp\xdf\x01!\x16@\xd0MwH9m\x05\xc0"
+S'\x8b\xb3\x81\x97\xa8i\x85@\xfd$\x13}{L\x8d@\x98T\xc0\xaaNn\x92@\xf9\xa5#%\xb4\xf0\x96@\xea\x01\x85d\x94r\x9d@5\x9e\xc6\xd9\x8a\xb5\xa6@'
 p457
 tp458
 bsba(i__main__
@@ -1203,7 +1191,7 @@ I1
 tp465
 g23
 I00
-S'\x18\x8e\xce>9\x16\x12@'
+S'\x8bUO\r\xc6\xd9\xa0@'
 p466
 tp467
 bag13
@@ -1219,7 +1207,7 @@ I1
 tp471
 g23
 I00
-S'\x9fY?\x16\x90\x9c\x0e\xc0'
+S'\x1b\x11\xd8\xc6\xbf\x8c\x9d@'
 p472
 tp473
 bag13
@@ -1235,7 +1223,7 @@ I1
 tp477
 g23
 I00
-S'\x1c\x02*t \x07\x12\xc0'
+S'\x8e\x963\x16\xa8\x88\x99@'
 p478
 tp479
 bag13
@@ -1251,7 +1239,7 @@ I1
 tp483
 g23
 I00
-S'x\xadoz4\xec\xf0\xbf'
+S')GSz\r\xec\x94@'
 p484
 tp485
 bag13
@@ -1267,7 +1255,7 @@ I1
 tp489
 g23
 I00
-S'`*$\xb9\xdaE\x17\xc0'
+S'\x06\x88\xc81\x86\x95\x8c@'
 p490
 tp491
 bag13
@@ -1283,7 +1271,7 @@ I1
 tp495
 g23
 I00
-S'A\x1d\xc8\x08\\\x81\x02@'
+S'C\x99\x18\x85+\x14]\xc0'
 p496
 tp497
 basg40
@@ -1315,7 +1303,7 @@ Rp507
 tp508
 g23
 I00
-S'\x80\xf5\xff\xff\xff\xff\xef?'
+S'\x02q\x87\xec\xe1\xf1\xa8!'
 p509
 tp510
 bag13
@@ -1330,7 +1318,7 @@ Rp513
 tp514
 g23
 I00
-S"\xde'\xf8E\xa5%\xec?"
+S't\xdcs\xe6\xe2\x9b\xb3*'
 p515
 tp516
 bag13
@@ -1345,7 +1333,7 @@ Rp519
 tp520
 g23
 I00
-S'\x96Q\x0f\xc3\xbf\xcc\xd4?'
+S'\x8b\x0eN\xfd\xbf\xa6\xa02'
 p521
 tp522
 bag13
@@ -1360,7 +1348,7 @@ Rp525
 tp526
 g23
 I00
-S'\xfc\xd9\xc5\xb3C\xfe\xef?'
+S'pPA\xea\x0b\xd6\xfc:'
 p527
 tp528
 bag13
@@ -1375,7 +1363,7 @@ Rp531
 tp532
 g23
 I00
-S'X\xb5\xd6\xffGv\xb5?'
+S'$AbQ4\xf0\xe7?'
 p533
 tp534
 basg60
@@ -1388,11 +1376,10 @@ tp536
 Rp537
 (I1
 (I1
-I1
 tp538
 g23
 I00
-S'\x13\x8eC\xddF\x8d\x19?'
+S'\x00\x00\x00\x00\x00\x00\xf0?'
 p539
 tp540
 bsg67
@@ -1405,11 +1392,10 @@ tp542
 Rp543
 (I1
 (I1
-I1
 tp544
 g23
 I00
-S'p\xf7\xcf\xa3\xa3\x8c\x19?'
+S'\x00\x00\x00\x00\x00\x00\x00\x00'
 p545
 tp546
 bsg74
@@ -1426,7 +1412,7 @@ I1
 tp550
 g23
 I00
-S'\x9c\\\x999\xc0x"\xc0'
+S'T\xd8\x0f\xb7\xe1+\xa0@'
 p551
 tp552
 bsg81
@@ -1443,7 +1429,7 @@ I1
 tp556
 g23
 I00
-S'\x18\x8e\xce>9\x16\x12@\x9fY?\x16\x90\x9c\x0e\xc0\x1c\x02*t \x07\x12\xc0x\xadoz4\xec\xf0\xbf`*$\xb9\xdaE\x17\xc0A\x1d\xc8\x08\\\x81\x02@'
+S'\x8bUO\r\xc6\xd9\xa0@\x1b\x11\xd8\xc6\xbf\x8c\x9d@\x8e\x963\x16\xa8\x88\x99@)GSz\r\xec\x94@\x06\x88\xc81\x86\x95\x8c@C\x99\x18\x85+\x14]\xc0'
 p557
 tp558
 bsbasg344
@@ -1453,43 +1439,33 @@ sg355
 I2
 sbasS'output_layer'
 p559
-(i__main__
-activation_function
+S'softmax'
 p560
-(dp561
-g352
-c__main__
-softmax_func
-p562
-sg67
-c__main__
-softmax_derivative
-p563
-sbsS'num_outputs'
-p564
+sS'num_outputs'
+p561
 I2
 sS'momentum'
-p565
+p562
 F0.9
 sS'num_layers'
-p566
+p563
 I2
 sS'total_error'
-p567
+p564
 g13
 (g14
 (I0
-tp568
+tp565
 g16
-tp569
-Rp570
+tp566
+Rp567
 (I1
 (I2
 I1
-tp571
+tp568
 g23
 I00
-S'\x17\xcf\xc8\x83D\x8d1>S_\xd4r.g4>'
-p572
-tp573
+S'\x00\x00\x00\x00\x00\x00\xc0?\x00\x00\x00\x00\x00\x00\xc0?'
+p569
+tp570
 bsb.
