@@ -55,7 +55,7 @@ return_value	deepnn.py	/^def return_value(x):$/;"	f
 set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:neural_network
 sigmoid_derivative	deepnn.py	/^def sigmoid_derivative(x):$/;"	f
 sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
-softmax_respect_der	deepnn.py	/^def softmax_respect_der(y,x):$/;"	f
+softmax_respect_der	deepnn.py	/^def softmax_respect_der(y_out,x,x_element):$/;"	f
 stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, x, y):$/;"	m	class:neural_network
 train_network	deepnn.py	/^    def train_network(self, x, y, batch_size, epochs):$/;"	m	class:neural_network

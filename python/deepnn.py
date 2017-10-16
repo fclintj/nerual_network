@@ -11,10 +11,9 @@ from   tensorflow.examples.tutorials.mnist import input_data
 def main():
     num_inputs = 2 
     num_outputs = 2
-    batch_size = 1
-    epochs = 1 
+    batch_size = 5000
+    epochs = 5 
     momentum = 0 
-
 
     # create the sigmoid activation function
     sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
@@ -23,24 +22,32 @@ def main():
 
     # create layer structure
     layer0 = layer(num_inputs,2,sigmoid)
-    layer1 = layer(2,2,sigmoid)
+    layer1 = layer(2,2,no_activation)
     hidden_layers = [layer0, layer1]
 
     # create neural network framework
     # network = pickle.load(open("./classasgntrain1.p","rb"))
 
-    network = neural_network(num_outputs,hidden_layers,softmax,momentum)
+    network = neural_network(num_outputs,hidden_layers,"softmax",momentum)
     network.set_initial_conditions()
-    x = np.array([0.05,0.10])
+    # x = np.array([0.05,0.10])
+    # y = np.array([0, 1])
 
-    y = np.array([0, 1])
+    x = np.array(
+        [[0.10, 0.05],
+         [0.03, 0.1],
+         [0.07, 0.3],
+         [0.02, 0.4]])
 
-    # print(network.forward_prop(x))
-    network.print_weights()
-    network.train_data(x,y)
-    network.print_weights()
+    y = np.array(
+        [[0, 1],
+         [1, 0],
+         [1, 0],
+         [1, 0]])
 
-    # print(network.classify_data(x))
+    network.train_network(x,y,batch_size,epochs)
+    print(network.classify_data(x))
+
     # network.write_network_values("classasgntrain1.p")
     
     
@@ -144,11 +151,12 @@ def stable_softmax_func(x):
     exps = np.exp(shiftx)
     return exps / np.sum(exps)
 
-def softmax_respect_der(y,x):
-    if y is x:
-        return y*(1-x)
-    else:
-        return -x*y
+def softmax_respect_der(y_out,x,x_element):
+    # for i, y in enumerate(y_out):
+    #     if i is x_element:
+    #         return y*(1-x)
+    #     else:
+    return -x*y
 
 def sigmoid_func(x):
     return 1/(1+np.exp(-x))
@@ -178,8 +186,8 @@ class neural_network:
         self.__set_layer_sigma()
 
     def __set_layer_sigma(self):
-        # set initial guesses for hidden layers - 1
         for i in range(len(self.layers)-1):
+        # set initial guesses for hidden layers - 1
             self.layers[i].sigma = np.sqrt(float(2) /
             (self.layers[i].num_inputs + self.layers[i+1].num_inputs))
             for j in range(self.layers[i].num_neurons):
@@ -193,19 +201,122 @@ class neural_network:
         for i in range(self.num_layers):
             for j in range(self.layers[i].num_neurons):
                 for k in range(len(self.layers[i].neurons[j].current_weight)):
-                   self.layers[i].neurons[j].current_weight[k] = self.layers[i].neurons[j].new_weight[k]
-
+                    self.layers[i].neurons[j].current_weight[k] = self.layers[i].neurons[j].new_weight[k]
+                    
     def __layer_opperations(self,X,layer):
         for i in range(layer.num_neurons):
             for j in range(X.shape[0]):
                 layer.neurons[i].weight_der[j] = X[j]
             layer.neurons[i].net = np.dot(X.T,layer.neurons[i].current_weight)
-            layer.neurons[i].output = layer.activation.function(layer.neurons[i].net)
 
-        output = np.empty([layer.num_neurons,1]) 
+        net = np.empty([layer.num_neurons,1]) 
         for i in range(layer.num_neurons):
-            output[i] = layer.neurons[i].output
-        return output
+            net[i] = layer.neurons[i].net
+            layer.neurons[i].output = layer.activation.function(net[i])
+
+        output = layer.activation.function(net)
+        return output 
+
+    def train_network(self, x, y, batch_size, epochs):
+        batch = np.random.randint(0,len(x),batch_size)
+        for i in range(epochs):
+            for sample in batch:
+                self.train_data(x[sample],y[sample]) 
+            print("Total error: %f"%(sum(self.total_error)))
+
+    def train_data(self, x, y):
+        yhat = np.array(self.forward_prop(x))
+        yhat = np.array(yhat).reshape((len(yhat),1))
+        y = np.array(y).reshape((len(y),1))
+        self.backward_prop(x,yhat,y)
+        self.total_error = 0.5*(yhat - y)*(yhat - y)
+
+    def forward_prop(self, data):
+        X = np.array(data).reshape((len(data),1))
+        X = np.r_[[[1]],X]
+        layer_output = self.__layer_opperations(X,self.layers[0])
+        for i in range(1,len(self.layers)):
+            layer_output = np.r_[[[1]],layer_output]
+            layer_output = self.__layer_opperations(layer_output,self.layers[i])
+
+        if self.output_layer == "softmax":
+            layer_output = stable_softmax_func(layer_output)
+
+        return np.array(layer_output).reshape(len(layer_output))
+    
+    def backward_prop(self,x,yhat,y):
+        eta = 1 
+        momentum_calculation = 0
+        der_out = yhat-y
+        # get derivatives for all layers
+        for layer in self.layers:
+            layer.find_neuron_derivatives()
+
+        der_err_tot = 0
+        # find weights for last layer if softmax
+        if self.output_layer == "softmax":
+            for i, neuron in enumerate(self.layers[self.num_layers-1].neurons):
+                for j in range(len(neuron.weight_der)):
+                    der_neur = 0
+                    for k in range(self.num_outputs):
+                        if i is k:
+                            der_neur += der_out[k] * (yhat[k]*(1-neuron.net)) * neuron.weight_der[j]
+                        else:
+                            der_neur += der_out[k] * (-yhat[k]*neuron.net) * neuron.weight_der[j]
+
+                    # update new weight
+                    momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
+                    neuron.new_weight[j] = neuron.current_weight[j] - momentum_calculation 
+
+             # find derivative of total output error with respect to penultimate layer
+            der_err_tot += der_out[0] * (yhat[k]*(1-self.layers[self.num_layers-1].neurons[0].net)) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+
+            for i in range(1,len(der_out)):
+                der_err_tot += der_out[i] * (-yhat[i]*self.layers[self.num_layers-1].neurons[0].net) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+
+        # find weights for last layer
+        else: 
+            for j in range(self.layers[self.num_layers-1].num_neurons):
+                for k in range(len(self.layers[self.num_layers-1].neurons[0].current_weight)):
+                    der_neur = self.layers[self.num_layers-1].neurons[0].weight_der[k] * self.layers[self.num_layers-1].neurons[j].derivative*der_out[j]
+
+                    # update new weight
+                    momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
+                    self.layers[self.num_layers-1].neurons[j].new_weight[k] = self.layers[self.num_layers-1].neurons[j].current_weight[k] - momentum_calculation 
+
+            # find derivative of total output error with respect to penultimate layer
+            for i in range(len(der_out)):
+                der_err_tot += self.layers[self.num_layers-1].neurons[i].current_weight[1] * self.layers[self.num_layers-1].neurons[i].derivative*der_out[i]
+        
+        # find derivative of total output error with respect to weights in hidden layers 
+        for i in range(self.num_layers-2,-1,-1):
+            for j in range(self.layers[i].num_neurons):
+                for k in range(len(self.layers[i].neurons[0].current_weight)):
+                    der_neur = self.layers[i].neurons[j].derivative * self.layers[i].neurons[j].weight_der[k] * der_err_tot
+
+                    # update new weight
+                    momentum_calculation = np.array(self.momentum * momentum_calculation) + np.array(eta) * der_neur
+                    self.layers[i].neurons[j].new_weight[k] = self.layers[i].neurons[j].current_weight[k] - momentum_calculation
+
+            # calculate new total multiplicative derivative for next layer
+            der_err_tot *= self.layers[i].neurons[0].weight_der[1]
+
+        self.__update_weights()
+
+    def classify_data(self, x):
+        output = np.empty([x.shape[0],1]) 
+        for i in range(x.shape[0]):
+            prob = self.forward_prop(x[i,:])
+            output[i] = np.argmax(prob) 
+        return output 
+
+    def repot_error(self, yhat, y):
+        # TODO: write a function that compares categorized data to actual output
+        print("verify accuracy")
+
+    def write_network_values(self, filename):
+        pickle.dump(self, open(filename, "wb"))
+        print("Network written to: %s" %(filename))
 
     def print_weights(self):
         for i, layer in enumerate(self.layers):
@@ -234,81 +345,6 @@ class neural_network:
          self.layers[1].neurons[1].current_weight[1] = 0.50
          self.layers[1].neurons[1].current_weight[2] = 0.55
 
-    def backward_prop(self,x,yhat,y):
-        eta = 1 
-        momentum_calculation = 0
-        der_out = yhat-y
-
-        # get derivatives for all layers
-        for layer in self.layers:
-            layer.find_neuron_derivatives()
-
-        # find derivative of total output error with respect to penultimate layer
-        der_err_tot = 0
-        for i in range(len(der_out)):
-            der_err_tot += self.layers[self.num_layers-1].neurons[i].current_weight[1] * self.layers[self.num_layers-1].neurons[i].derivative*der_out[i]
-
-        # find weights for last layer
-        for j in range(self.layers[self.num_layers-1].num_neurons):
-            for k in range(len(self.layers[self.num_layers-1].neurons[0].current_weight)):
-                der_neur = self.layers[self.num_layers-1].neurons[0].weight_der[k] * self.layers[self.num_layers-1].neurons[j].derivative*der_out[j]
-
-                # update new weight
-                momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
-                self.layers[self.num_layers-1].neurons[j].new_weight[k] = self.layers[self.num_layers-1].neurons[j].current_weight[k] - momentum_calculation 
-
-        # find derivative of total output error with respect to weights in hidden layers 
-        for i in range(self.num_layers-2,-1,-1):
-            for j in range(self.layers[i].num_neurons):
-                for k in range(len(self.layers[i].neurons[0].current_weight)):
-                    der_neur = self.layers[i].neurons[j].derivative * self.layers[i].neurons[j].weight_der[k] * der_err_tot
-
-                    # update new weight
-                    momentum_calculation = np.array(self.momentum * momentum_calculation) + np.array(eta) * der_neur
-                    self.layers[i].neurons[j].new_weight[k] = self.layers[i].neurons[j].current_weight[k] - momentum_calculation
-
-
-            # calculate new total multiplicative derivative for next layer
-            der_err_tot *= self.layers[i].neurons[0].weight_der[1]
-        self.__update_weights()
-
-    def train_network(self, x, y, batch_size, epochs):
-        batch = np.random.randint(0,len(x),batch_size)
-        for i in range(epochs):
-            for sample in batch:
-                self.train_data(x[sample],y[sample]) 
-            print("Total error: %f"%(sum(self.total_error)))
-
-    def train_data(self, x, y):
-        yhat = np.array(self.forward_prop(x))
-        y = np.array(y).reshape((len(y),1))
-        yhat = np.array(yhat).reshape((len(yhat),1))
-        self.backward_prop(x,yhat,y)
-        self.total_error = 0.5*(yhat - y)*(yhat - y)
-
-    def forward_prop(self, data):
-        X = np.array(data).reshape((len(data),1))
-        X = np.r_[[[1]],X]
-        layer_input = self.__layer_opperations(X,self.layers[0])
-        for i in range(1,len(self.layers)):
-            layer_input = np.r_[[[1]],layer_input]
-            layer_input = self.__layer_opperations(layer_input,self.layers[i])
-        return np.array(layer_input).reshape(len(layer_input))
-    
-    def classify_data(self, x):
-        output = np.empty([x.shape[0],1]) 
-        for i in range(x.shape[0]):
-            prob = self.forward_prop(x[i,:])
-            output[i] = np.argmax(prob) 
-        return output 
-
-    def repot_error(self, yhat, y):
-        # TODO: write a function that compares categorized data to actual output
-        print("verify accuracy")
-
-    def write_network_values(self, filename):
-        pickle.dump(self, open(filename, "wb"))
-        print("Network written to: %s" %(filename))
 
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
