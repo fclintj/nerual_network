@@ -13,27 +13,30 @@ def main():
     num_inputs = 2
     num_outputs = 3
     batch_size = 200
-    epochs = 40
+    epochs = 500
 
-    X,Y = get_3_class_data()
+    X,Y = pickle.load(open("./in_out.p","rb"))
     
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 5
+    num_neurons = 3
     # input layer
     layers = [layer(num_inputs,num_outputs,no_activation)]
     # layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
     network = NeuralNetwork(layers) 
+    network.set_initial_conditions()
 
     # train network
     network.train_network(X,Y,batch_size,epochs)
 
     # classify data
     Yhat = network.classify_data(X)
+    # print(Yhat)
+    # print(Y)
     network.validate_results(Yhat,Y) 
     # print(Yhat)
     # network.write_network_values("network_first.p")
@@ -54,7 +57,6 @@ def get_2_class_data():
                   [0.01, 0.99],
                   [0.01, 0.99]])
     return X,Y
-
 
 def get_3_class_data():
     X = np.array([[0.05, 0.1],
@@ -96,7 +98,7 @@ def get_moon_class_data():
     return data.xtot,data.class_tot
 
 class NeuralNetwork:
-    def __init__(self,    layers,   softmax=True,  momentum=0.8, \
+    def __init__(self,    layers,   softmax=True,  momentum=0.9, \
                  eta=0.1, scale=0.01  ):
 
         self.softmax=softmax
@@ -125,7 +127,7 @@ class NeuralNetwork:
         for layer in self.layers:
             prev_out = np.c_[prev_out,np.ones([prev_out.shape[0],1])]
             prev_out = layer.forward(prev_out)
-
+        
         if self.softmax is True:
             self.layers[-1].output = self.stable_softmax(self.layers[-1].net)
 
@@ -144,9 +146,11 @@ class NeuralNetwork:
         percent_complete = 0
         print("Training Data...")
         for i in range(epochs):
-            batch = np.random.randint(0,X.shape[0],batch_size)
+            # batch = np.random.randint(0,X.shape[0],batch_size)
+            batch = [range(4)]
             for j, sample in enumerate(batch):
                 self.error_array = [] 
+                # self.train_data(X[sample],Y[sample]) 
                 self.train_data(X,Y) 
                 if j%MSE_freq is 0:
                     self.total_error.append(np.mean(self.error_array))
@@ -164,14 +168,12 @@ class NeuralNetwork:
         # back propagation
         if self.softmax is True:
             dE_dWeight = -np.dot((Y-Yhat).T,self.layers[-1].weight_der) / \
-                        self.layers[-1].weight_der.shape[0] + \
-                        self.scale * self.layers[-1].W
+                        self.layers[-1].weight_der.shape[0] #+ \
+                        # self.scale * self.layers[-1].W
 
-            self.layers[-1].momentum_matrix = \
-                    self.momentum * self.layers[-1].momentum_matrix + \
-                    self.eta * dE_dWeight
-            self.layers[-1].W += - self.layers[-1].momentum_matrix
-            dE_dH = (Yhat-(Y==1).astype(int)).T/Yhat.shape[0]
+            self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
+            self.layers[-1].momentum_matrix = dE_dWeight
+            # dE_dH = (Yhat-(Y==1).astype(int)).T/Yhat.shape[0]
             next(iterlayers)
 
         for layer in iterlayers:
@@ -202,13 +204,22 @@ class NeuralNetwork:
     def validate_results(self, Yhat, Y):
         Yhat_enc = (np.arange(np.max(Yhat) + 1) == Yhat[:, None]).astype(float)
         num_err = np.sum(abs(Yhat_enc - Y))/2
-        print("%d Mistakes. Training Accuracy: %.4f%%"%(len(Yhat)-num_err,float(num_err)/len(Yhat)))
+        print("%d Mistakes. Training Accuracy: %.2f%%"%(int(num_err),
+            (len(Yhat)-num_err)/len(Yhat)*100))
 
     def set_initial_conditions(self):
-        self.layers[0].W[0,:] = [0.15,0.2,0.35]
-        self.layers[0].W[1,:] = [0.25,0.3,0.35]
-        self.layers[1].W[0,:] = [0.4,0.45,0.6]
-        self.layers[1].W[1,:] = [0.5,0.55,0.6]
+        # self.layers[0].W[0,:] = [0.15,0.2,0.35]
+        # self.layers[0].W[1,:] = [0.25,0.3,0.35]
+        # self.layers[0].W[2,:] = [0.25,0.3,0.35]
+
+        self.layers[0].W[0,:] = [0.1,0.1,0.01]
+        self.layers[0].W[1,:] = [0.2,0.2,0.1 ]
+        self.layers[0].W[2,:] = [0.3,0.3,0.1 ]
+
+        # self.layers[1].W[0,:] = [0.4,0.45,0.6]
+        # self.layers[1].W[1,:] = [0.5,0.55,0.6]
+        # self.layers[1].W[2,:] = [0.5,0.55,0.6]
+
         
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
@@ -219,7 +230,7 @@ class layer:
         self.activation = activation
         self.net = None
         self.W = np.random.uniform(0,1,[num_neurons,num_inputs+1])
-        self.momentum_matrix = np.empty([num_neurons,num_inputs+1])
+        self.momentum_matrix = np.zeros([num_neurons,num_inputs+1])
         self.output = None  
     
 
