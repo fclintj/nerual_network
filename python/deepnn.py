@@ -11,13 +11,17 @@ from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
     num_inputs = 2
-    num_outputs = 2
-    batch_size = 200
-    epochs = 5000
+    num_outputs= 2
+    batch_size = 100
+    epics = 10 
 
     # X,Y = pickle.load(open("./in_out.p","rb"))
     # X,Y = get_moon_class_data() 
+    X,Y = get_mnist_train
+    X = mnist.train.images
+    y = mnist.train.labels.astype("int")
     
+
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
@@ -33,7 +37,7 @@ def main():
     network.set_initial_conditions()
 
     # train network
-    network.train_network(X,Y,batch_size,epochs)
+    network.train_network(X,Y,batch_size,epics)
 
     # classify data
     Yhat = network.classify_data(X)
@@ -111,7 +115,7 @@ class NeuralNetwork:
         self.scale = scale
         self.eta = eta 
         self.softmax = softmax 
-        self.total_error = [] 
+        self.error_plot = [] 
         self.error_array = [] 
         self.__set_GRV_starting_weights()
 
@@ -140,26 +144,33 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epochs, MSE_freq=30):
-        error_array_output = []
-        print_tenth = epochs/100
-        if epochs < 100:
-            print_tenth = 1
-        percent_complete = 0
+    def train_network(self, X, Y, batch_size, epics, MSE_freq=30):
         print("Training Data...")
-        for i in range(epochs):
-            # batch = np.random.randint(0,X.shape[0],batch_size)
-            batch = [range(4)]
-            for j, sample in enumerate(batch):
-                self.error_array = [] 
-                # self.train_data(X[sample],Y[sample]) 
-                self.train_data(X,Y) 
-                if j%MSE_freq is 0:
-                    self.total_error.append(np.mean(self.error_array))
-                    self.error_array = []
-            if i%print_tenth is 0 :
-                percent_complete += 1
-                print("%d%% MSE: %f"%(percent_complete, self.total_error[i]))
+
+        if epics > 5000:
+            print_frequency = epics/100
+            print(print_frequency)
+        else:
+            print_frequency = epics/10
+        
+        for i in range(epics):
+            batch = np.random.randint(0,X.shape[0],batch_size)
+            self.train_data(X[batch],Y[batch]) 
+            if i%print_frequency is 0:
+                print("Epic %d MSE: %f"%(i+1, np.mean(self.error_array[-MSE_freq:])))
+         
+        # create error plot
+        plot = self.error_array[::-1]
+        for i in range(0,len(plot),MSE_freq):
+            self.error_plot.append(np.mean(plot[i:i+MSE_freq]))
+        self.error_plot = self.error_plot[::-1]
+
+            # if j%MSE_freq is 0:
+            #     self.error_plot.append(np.mean(self.error_array))
+            #     self.error_array = []
+            # if i%print_tenth is 0 :
+            #     percent_complete += 1
+            #     print("%d%% MSE: %f"%(percent_complete, self.error_plot[i]))
         # print("Total Mean Squared Error: %f"%(np.mean(self.error_array)))
 
     def train_data(self, X, Y):
@@ -196,7 +207,7 @@ class NeuralNetwork:
         return exp_norm / np.sum(exp_norm, axis=1).reshape((-1,1))
 
     def plot_error(self):
-        plt.plot(range(len(self.total_error)), self.total_error)
+        plt.plot(range(len(self.error_plot)), self.error_plot)
         plt.show()
 
     def write_network_values(self, filename):
@@ -294,7 +305,6 @@ def print_images(ordered,m,n):
             ax[i][j].axis("off")
     plt.show()
 
-
 def sigmoid_func(x):
     return 1/(1+np.exp(-x))
 
@@ -371,6 +381,32 @@ def gendata2(class_type,N):
             return 0 
         x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
     return x.T
+
+def get_ordered(X_train):
+    ordered = [ 
+            X_train[7] , # 0 
+            X_train[4] , # 1 
+            X_train[16], # 2
+            X_train[1] , # 3 
+            X_train[2] , # 4
+            X_train[27], # 5
+            X_train[3] , # 6
+            X_train[14], # 7 
+            X_train[5] , # 8 
+            X_train[8] , # 9
+            ]       
+    return ordered
+
+def print_images(ordered,m,n):
+    f, ax = plt.subplots(m,n)
+    ordered = get_ordered(X_train);
+    for i in range(m):
+        for j in range(n):
+            ordered[i*n+j] = ordered[i*n+j].reshape(28,28)
+            ax[i][j].imshow(ordered[i*n+j], cmap = plt.cm.binary, interpolation="nearest")
+            ax[i][j].axis("off")
+
+    plt.show()
 
 if __name__ == '__main__':
   main()

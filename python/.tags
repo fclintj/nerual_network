@@ -61,7 +61,7 @@ softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
 stable_softmax	deepnn.py	/^    def stable_softmax(self, X):$/;"	m	class:NeuralNetwork
 stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
-train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epochs, MSE_freq=30):$/;"	m	class:NeuralNetwork
+train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epics, MSE_freq=30):$/;"	m	class:NeuralNetwork
 train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v
 um_neurons	classasgntrain1.p	/^sbsS'num_neurons'$/;"	f
 validate_results	deepnn.py	/^    def validate_results(self, Yhat, Y):$/;"	m	class:NeuralNetwork
