@@ -7,7 +7,7 @@
 NeuralNetwork	deepnn.py	/^class NeuralNetwork:$/;"	c
 X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
 Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
-__init__	deepnn.py	/^                 eta=0.5, scale=0.01  ):$/;"	m	class:NeuralNetwork
+__init__	deepnn.py	/^                 eta=0.1, scale=0.01  ):$/;"	m	class:NeuralNetwork
 __init__	deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
@@ -57,7 +57,7 @@ set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	c
 sigmoid_der	deepnn.py	/^def sigmoid_der(x):$/;"	f
 sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
 softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
-stable_softmax	deepnn.py	/^    def stable_softmax(self, Z):$/;"	m	class:NeuralNetwork
+stable_softmax	deepnn.py	/^    def stable_softmax(self, X):$/;"	m	class:NeuralNetwork
 stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epochs, MSE_freq=30):$/;"	m	class:NeuralNetwork

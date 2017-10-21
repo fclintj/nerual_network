@@ -11,11 +11,11 @@ from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
     num_inputs = 2
-    num_outputs = 2
+    num_outputs = 3
     batch_size = 200
     epochs = 40
 
-    X,Y = get_class_data()
+    X,Y = get_3_class_data()
     
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
@@ -23,11 +23,11 @@ def main():
     
     num_neurons = 5
     # input layer
-    layers = [layer(num_inputs,num_neurons,relu)]
-    layers.append(layer(num_neurons,num_outputs,sig))
+    layers = [layer(num_inputs,num_outputs,no_activation)]
+    # layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
-    network = NeuralNetwork(layers,softmax=False) 
+    network = NeuralNetwork(layers) 
 
     # train network
     network.train_network(X,Y,batch_size,epochs)
@@ -43,7 +43,7 @@ def main():
 
 def get_2_class_data():
     X = np.array([[0.05, 0.1],
-                  [0.05, 0.1],
+                  [0.07, 0.1],
                   [0.05, 0.1],
                   [0.05, 0.1],
                   [0.05, 0.1]])
@@ -55,7 +55,20 @@ def get_2_class_data():
                   [0.01, 0.99]])
     return X,Y
 
+
 def get_3_class_data():
+    X = np.array([[0.05, 0.1],
+                  [0.07, 0.3],
+                  [0.09, 0.5],
+                  [0.05, 0.1]])
+
+    Y = np.array([[1, 0, 0],
+                  [0, 1, 0],
+                  [0, 0, 1],
+                  [1, 0, 0]])
+    return X,Y
+
+def get_sprial_class_data():
     np.random.seed(0)
     N = 100 # number of points per class
     D = 2 # dimensionality
@@ -75,7 +88,7 @@ def get_3_class_data():
     Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
     return X,Y
 
-def get_class_data():
+def get_moon_class_data():
     data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
     x0 = data[:,0:2]
     x1 = data[:,2:4]
@@ -158,7 +171,7 @@ class NeuralNetwork:
                     self.momentum * self.layers[-1].momentum_matrix + \
                     self.eta * dE_dWeight
             self.layers[-1].W += - self.layers[-1].momentum_matrix
-            dE_dH = (Yhat-(Y==1).astype(int))[0].T/Yhat.shape[0]
+            dE_dH = (Yhat-(Y==1).astype(int)).T/Yhat.shape[0]
             next(iterlayers)
 
         for layer in iterlayers:
@@ -188,10 +201,8 @@ class NeuralNetwork:
 
     def validate_results(self, Yhat, Y):
         Yhat_enc = (np.arange(np.max(Yhat) + 1) == Yhat[:, None]).astype(float)
-        # Y_enc = (np.arange(np.max(Y) + 1) == Y[:, None]).astype(float)
         num_err = np.sum(abs(Yhat_enc - Y))/2
-
-        print("%d Mistakes. %% Error: %.4f"%(num_err,float(num_err)/len(Yhat)))
+        print("%d Mistakes. Training Accuracy: %.4f%%"%(len(Yhat)-num_err,float(num_err)/len(Yhat)))
 
     def set_initial_conditions(self):
         self.layers[0].W[0,:] = [0.15,0.2,0.35]
