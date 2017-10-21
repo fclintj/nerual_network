@@ -6,101 +6,200 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pickle
+import time
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
-    num_inputs = 2 
-    num_outputs = 2
-    batch_size = 5000
-    epochs = 5 
-    momentum = 0 
+    num_inputs = 784
+    num_outputs = 10 
+    batch_size = 500
+    epochs = 70
+    
 
-    # create the sigmoid activation function
-    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
-    softmax = activation_function(stable_softmax_func,softmax_respect_der)
+    mnist = input_data.read_data_sets("/tmp/data/") # or wherever you want
+
+    # to put your data
+    X_train = mnist.train.images
+    y_train = mnist.train.labels.astype("int")
+    y_enc = (np.arange(np.max(y_train) + 1) == y_train[:, None]).astype(float)
+
+    X_test = mnist.test.images
+    y_test = mnist.test.labels.astype("int")
+
+    relu = activation_function(relu_func,relu_der)
+    sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
-
-    # create layer structure
-    layer0 = layer(num_inputs,2,sigmoid)
-    layer1 = layer(2,2,no_activation)
-    hidden_layers = [layer0, layer1]
-
-    # create neural network framework
-    # network = pickle.load(open("./classasgntrain1.p","rb"))
-
-    network = neural_network(num_outputs,hidden_layers,"softmax",momentum)
-    network.set_initial_conditions()
-    # x = np.array([0.05,0.10])
-    # y = np.array([0, 1])
-
-    x = np.array(
-        [[0.10, 0.05],
-         [0.03, 0.1],
-         [0.07, 0.3],
-         [0.02, 0.4]])
-
-    y = np.array(
-        [[0, 1],
-         [1, 0],
-         [1, 0],
-         [1, 0]])
-
-    network.train_network(x,y,batch_size,epochs)
-    print(network.classify_data(x))
-
-    # network.write_network_values("classasgntrain1.p")
     
+    num_neurons = 10
+    # input layer
+    layers = [layer(num_inputs,num_neurons,sig)]
+    # hidden layers
+    for i in range(2):
+        layers.append(layer(num_neurons,num_neurons,sig))
+    # output layer
+    layers.append(layer(num_neurons,num_outputs,no_activation))
+
+    # create neural network
+    network = NeuralNetwork(layers) 
+
+    # train network
+    network.train_network(X_train[0:11],y_enc[0:11],batch_size,epochs)
     
-def plot_data(data):
-    fig = plt.figure() # make handle to save plot 
-    plt.scatter(data.x0[:,0],data.x0[:,1],c='red',label='$x_0$')
-    plt.scatter(data.x1[:,0],data.x1[:,1],c='blue',label='$x_1$')
-    plt.xlabel('X Coordinate') 
-    plt.ylabel('Y Coordinate') 
-    plt.legend()
+    # classify data
+    yhat = network.classify_data(X_train[0:11])
+    print(yhat) 
+    print(y_train)
 
-def plot_boundaries(data,equation):
-    xp1 = np.linspace(data.xlim[0],data.xlim[1], num=100)
-    yp1 = np.linspace(data.ylim[0],data.ylim[1], num=100) 
+    # network.write_network_values("network_first.p")
+
+    # plot error
+    network.plot_error()    
+
+class NeuralNetwork:
+    def __init__(self,    layers,   softmax=True,  momentum=0, \
+                 eta=0.9, scale=0.01  ):
+
+        self.softmax=softmax
+        self.num_layers = len(layers)
+        self.num_outputs = layers[self.num_layers-1].num_neurons
+        self.layers = layers
+        self.momentum = momentum
+        self.scale = scale
+        self.eta = eta 
+        self.softmax = softmax 
+        self.total_error = [] 
+        self.error_array = [] 
+        self.__set_GRV_starting_weights()
+
+    def __set_GRV_starting_weights(self):
+        for i in range(self.num_layers-2):
+            self.layers[i].num_outputs = self.layers[i+1].num_neurons
+        self.layers[-1].num_outputs = self.num_outputs
+
+        for layer in self.layers:
+            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_inputs)) 
+            layer.W = np.random.normal(0,sigma,layer.W.shape)
+
+    def forward_prop(self, X):
+        prev_out = X
+        for layer in self.layers:
+            prev_out = np.c_[prev_out,np.ones([prev_out.shape[0],1])]
+            prev_out = layer.forward(prev_out)
+
+        if self.softmax is True:
+            self.layers[-1].output = self.stable_softmax(self.layers[-1].net)
+
+        return self.layers[-1].output 
+         
+    def classify_data(self, X):
+        Yhat = self.forward_prop(X)
+        class_type = np.argmax(Yhat,axis=1)
+        return class_type
+
+    def train_network(self, X, Y, batch_size, epochs, MSE_freq=30):
+        error_array_output = []
+        print_tenth = epochs/100
+        percent_complete = 0
+        print("Training Data...")
+        for i in range(epochs):
+            batch = np.random.randint(0,X.shape[0],batch_size)
+            for j, sample in enumerate(batch):
+                self.error_array = [] 
+                self.train_data(X[0:11],Y[0:11]) 
+                if j%MSE_freq is 0:
+                    self.total_error.append(np.mean(self.error_array))
+                    self.error_array = []
+            if i%print_tenth is 0 :
+                percent_complete += 1
+                print("%d%% MSE: %f"%(percent_complete, self.total_error[i]))
+        print("Total Mean Squared Error: %f"%(np.mean(self.error_array)))
+
+    def train_data(self, X, Y):
+        Yhat = self.forward_prop(X)
+        dE_dH = (Yhat-Y).T
+
+        # back propagation
+        if self.softmax is True:
+            dE_dWeight = -np.dot((Y-Yhat).T,self.layers[-1].weight_der) / \
+                        self.layers[-1].weight_der.shape[0] + \
+                        self.scale * self.layers[-1].W
+
+            self.layers[-1].momentum_matrix = \
+                    self.momentum * self.layers[-1].momentum_matrix + \
+                    self.eta * dE_dWeight
+            self.layers[-1].W += - self.layers[-1].momentum_matrix
+            # dE_dH = (Yhat-(Y==1).astype(int))[0].T/Yhat.shape[0]
+
+        iterlayers = iter(self.layers[::-1])
+        next(iterlayers)
+        for layer in iterlayers:
+            dE_dNet = np.dot(layer.der(layer.output),dE_dH.T) 
+            dE_dWeight = (np.dot(dE_dNet,layer.weight_der))/layer.weight_der.shape[0]
+            dE_dH = np.dot(layer.W[:,0].T,dE_dNet)
+
+            layer.momentum_matrix = \
+                    self.momentum * layer.momentum_matrix + \
+                    self.eta * dE_dWeight
+            layer.W += - layer.momentum_matrix
+
+        # self.error_array.append(-np.mean(np.sum(np.log(Yhat)*Y)))
+        self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
+
+    def stable_softmax(self, Z):
+        Z = np.maximum(Z, -1e3)
+        Z = np.minimum(Z, 1e3)
+        numerator = np.exp(Z)
+        denom = np.sum(numerator, axis=1).reshape((-1,1))
+        return numerator / denom 
+
+    def plot_error(self):
+        plt.plot(range(len(self.total_error)), self.total_error)
+        plt.show()
+
+    def write_network_values(self, filename):
+        pickle.dump(self, open(filename, "we"))
+        print("Network written to: %s" %(filename))
+
+    def set_initial_conditions(self):
+        self.layers.W[0,:] = [0.1,0.1,0.01]
+        self.layers.W[1,:] = [0.2,0.2,0.1 ]
+        self.layers.W[2,:] = [0.3,0.3,0.1 ]
+        
+class layer:
+    def __init__(self,num_inputs,num_neurons, activation):
+        self.num_neurons = num_neurons
+        self.num_inputs = num_inputs
+        self.num_outputs = None
+        self.weight_der = None
+        self.activation = activation
+        self.net = None
+        self.W = np.random.uniform(0,1,[num_neurons,num_inputs+1])
+        self.momentum_matrix = np.empty([num_neurons,num_inputs+1])
+        self.output = None  
     
-    red_pts = np.array([[],[]])
-    blue_pts= np.array([[],[]])
-    for x in xp1:
-        for y in yp1:
-            prob = equation([x,y])
-            if prob[0] > prob[1]: 
-                blue_pts = np.c_[blue_pts,[x,y]]
-            else:
-                red_pts = np.c_[red_pts,[x,y]]
 
-    plot_data(data)
-    plt.scatter(blue_pts[0,:],blue_pts[1,:],color='blue',s=0.25)
-    plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
-    plt.xlim(data.xlim)
-    plt.ylim(data.ylim)
-    plt.show()
+    def forward(self, X):
+        self.weight_der = X
+        self.net = np.dot(X, self.W.T) 
+        self.output = self.activation.function(self.net)
+        return self.output
 
-def gendata2(class_type,N):
-    m0 = np.array(
-         [[-0.132,0.320,1.672,2.230,1.217,-0.819,3.629,0.8210,1.808, 0.1700],
-          [-0.711,-1.726,0.139,1.151,-0.373,-1.573,-0.243,-0.5220,-0.511,0.5330]])
+    def der(self, X):
+        return self.activation.derivative(X)
 
-    m1 = np.array(
-          [[-1.169,0.813,-0.859,-0.608,-0.832,2.015,0.173,1.432,0.743,1.0328],
-          [ 2.065,2.441,0.247,1.806,1.286,0.928,1.923,0.1299,1.847,-0.052]])
+    def set_initial_conditions(self):
+        print("test")
 
-    x = np.array([[],[]])
-    for i in range(N):
-        idx = np.random.randint(10)
-        if class_type == 0:
-            m = m0[:,idx]
-        elif class_type == 1:
-            m = m1[:,idx]
-        else:
-            print("not a proper classifier")
-            return 0 
-        x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
-    return x.T
+class activation_function:
+    def __init__(self,function,derivative):
+        self.function = function
+        self.derivative = derivative
+
+    def function(self,x):
+        return self.function(x) 
+
+    def derivative(self,x):
+        return self.derivative(x) 
 
 class data_frame:
     def __init__(self, data0, data1):
@@ -140,233 +239,95 @@ def print_images(ordered,m,n):
             ordered[i*n+j] = ordered[i*n+j].reshape(28,28)
             ax[i][j].imshow(ordered[i*n+j], cmap = plt.cm.binary, interpolation="nearest")
             ax[i][j].axis("off")
-
     plt.show()
 
-def return_value(x):
-    return x
+def test_bi_linear(network,data,yhat):
+    print(yhat)
+    num_err = sum(abs(yhat.reshape(-1,1) - data.y))
+    print("Percent of errors: %.4f"%(float(num_err)/data.N))
+
+    test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
+    yhat = network.classify_data(test_data.xtot)
+    num_err = sum(abs(yhat.reshape(-1,1)- test_data.y))
+    print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
+    plot_boundaries(data,network.classify_data) 
+
+def sigmoid_func(x):
+    return 1/(1+np.exp(-x))
+
+def sigmoid_der(x):
+    return (x*(1-x))
+
+def return_value(X):
+    return X
+
+def relu_func(X):
+    return np.maximum(0,X)
+    
+def relu_der(X):
+    X[X<0]=0
+    return X
 
 def stable_softmax_func(x):
     shiftx = x - np.max(x)
     exps = np.exp(shiftx)
     return exps / np.sum(exps)
 
-def softmax_respect_der(y_out,x,x_element):
-    # for i, y in enumerate(y_out):
-    #     if i is x_element:
-    #         return y*(1-x)
-    #     else:
-    return -x*y
+def softmax_func(x):
+    exps = np.exp(x)
+    return exps / np.sum(exps)
 
-def sigmoid_func(x):
-    return 1/(1+np.exp(-x))
+def plot_data(data):
+    fig = plt.figure() # make handle to save plot 
+    plt.scatter(data.x0[:,0],data.x0[:,1],c='red',label='$x_0$')
+    plt.scatter(data.x1[:,0],data.x1[:,1],c='blue',label='$x_1$')
+    plt.xlabel('X Coordinate') 
+    plt.ylabel('Y Coordinate') 
+    plt.legend()
 
-def sigmoid_derivative(x):
-    return (x*(1-x))
-
-class activation_function:
-    def __init__(self,function,derivative):
-        self.function = function
-        self.derivative = derivative
-
-    def function(self,x):
-        return self.function(x) 
-
-    def derivative(self,x):
-        return self.derivative(x) 
-
-class neural_network:
-    def __init__(self, num_outputs, layers, output_layer, momentum):
-        self.num_outputs = num_outputs
-        self.num_layers= len(layers)
-        self.layers = layers
-        self.momentum = momentum
-        self.output_layer = output_layer
-        self.total_error = None
-        self.__set_layer_sigma()
-
-    def __set_layer_sigma(self):
-        for i in range(len(self.layers)-1):
-        # set initial guesses for hidden layers - 1
-            self.layers[i].sigma = np.sqrt(float(2) /
-            (self.layers[i].num_inputs + self.layers[i+1].num_inputs))
-            for j in range(self.layers[i].num_neurons):
-                self.layers[i].neurons[j].current_weight = np.random.normal(0,self.layers[i].sigma,[self.layers[i].num_inputs+1,1])
-
-        # set initial guesses for last hidden layer
-        for j in range(self.layers[len(self.layers)-1].num_neurons):
-            self.layers[len(self.layers)-1].neurons[j].current_weight = np.random.normal(0,self.layers[i].sigma,[self.layers[len(self.layers)-1].num_inputs+1,1])
-
-    def __update_weights(self):
-        for i in range(self.num_layers):
-            for j in range(self.layers[i].num_neurons):
-                for k in range(len(self.layers[i].neurons[j].current_weight)):
-                    self.layers[i].neurons[j].current_weight[k] = self.layers[i].neurons[j].new_weight[k]
-                    
-    def __layer_opperations(self,X,layer):
-        for i in range(layer.num_neurons):
-            for j in range(X.shape[0]):
-                layer.neurons[i].weight_der[j] = X[j]
-            layer.neurons[i].net = np.dot(X.T,layer.neurons[i].current_weight)
-
-        net = np.empty([layer.num_neurons,1]) 
-        for i in range(layer.num_neurons):
-            net[i] = layer.neurons[i].net
-            layer.neurons[i].output = layer.activation.function(net[i])
-
-        output = layer.activation.function(net)
-        return output 
-
-    def train_network(self, x, y, batch_size, epochs):
-        batch = np.random.randint(0,len(x),batch_size)
-        for i in range(epochs):
-            for sample in batch:
-                self.train_data(x[sample],y[sample]) 
-            print("Total error: %f"%(sum(self.total_error)))
-
-    def train_data(self, x, y):
-        yhat = np.array(self.forward_prop(x))
-        yhat = np.array(yhat).reshape((len(yhat),1))
-        y = np.array(y).reshape((len(y),1))
-        self.backward_prop(x,yhat,y)
-        self.total_error = 0.5*(yhat - y)*(yhat - y)
-
-    def forward_prop(self, data):
-        X = np.array(data).reshape((len(data),1))
-        X = np.r_[[[1]],X]
-        layer_output = self.__layer_opperations(X,self.layers[0])
-        for i in range(1,len(self.layers)):
-            layer_output = np.r_[[[1]],layer_output]
-            layer_output = self.__layer_opperations(layer_output,self.layers[i])
-
-        if self.output_layer == "softmax":
-            layer_output = stable_softmax_func(layer_output)
-
-        return np.array(layer_output).reshape(len(layer_output))
+def plot_boundaries(data,equation):
+    xp1 = np.linspace(data.xlim[0],data.xlim[1], num=100)
+    yp1 = np.linspace(data.ylim[0],data.ylim[1], num=100) 
     
-    def backward_prop(self,x,yhat,y):
-        eta = 1 
-        momentum_calculation = 0
-        der_out = yhat-y
-        # get derivatives for all layers
-        for layer in self.layers:
-            layer.find_neuron_derivatives()
+    red_pts = np.array([[],[]])
+    blue_pts= np.array([[],[]])
+    for x in xp1:
+        for y in yp1:
+            point = np.array([x,y]).reshape(1,2)
+            prob = equation(point)
+            if prob == 0:
+                blue_pts = np.c_[blue_pts,[x,y]]
+            else:
+                red_pts = np.c_[red_pts,[x,y]]
 
-        der_err_tot = 0
-        # find weights for last layer if softmax
-        if self.output_layer == "softmax":
-            for i, neuron in enumerate(self.layers[self.num_layers-1].neurons):
-                for j in range(len(neuron.weight_der)):
-                    der_neur = 0
-                    for k in range(self.num_outputs):
-                        if i is k:
-                            der_neur += der_out[k] * (yhat[k]*(1-neuron.net)) * neuron.weight_der[j]
-                        else:
-                            der_neur += der_out[k] * (-yhat[k]*neuron.net) * neuron.weight_der[j]
+    plot_data(data)
+    plt.scatter(blue_pts[0,:],blue_pts[1,:],color='blue',s=0.25)
+    plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
+    plt.xlim(data.xlim)
+    plt.ylim(data.ylim)
+    plt.show()
 
-                    # update new weight
-                    momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
-                    neuron.new_weight[j] = neuron.current_weight[j] - momentum_calculation 
+def gendata2(class_type,N):
+    m0 = np.array(
+         [[-0.132,0.320,1.672,2.230,1.217,-0.819,3.629,0.8210,1.808, 0.1700],
+          [-0.711,-1.726,0.139,1.151,-0.373,-1.573,-0.243,-0.5220,-0.511,0.5330]])
 
-             # find derivative of total output error with respect to penultimate layer
-            der_err_tot += der_out[0] * (yhat[k]*(1-self.layers[self.num_layers-1].neurons[0].net)) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+    m1 = np.array(
+          [[-1.169,0.813,-0.859,-0.608,-0.832,2.015,0.173,1.432,0.743,1.0328],
+          [ 2.065,2.441,0.247,1.806,1.286,0.928,1.923,0.1299,1.847,-0.052]])
 
-            for i in range(1,len(der_out)):
-                der_err_tot += der_out[i] * (-yhat[i]*self.layers[self.num_layers-1].neurons[0].net) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
-
-        # find weights for last layer
-        else: 
-            for j in range(self.layers[self.num_layers-1].num_neurons):
-                for k in range(len(self.layers[self.num_layers-1].neurons[0].current_weight)):
-                    der_neur = self.layers[self.num_layers-1].neurons[0].weight_der[k] * self.layers[self.num_layers-1].neurons[j].derivative*der_out[j]
-
-                    # update new weight
-                    momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
-                    self.layers[self.num_layers-1].neurons[j].new_weight[k] = self.layers[self.num_layers-1].neurons[j].current_weight[k] - momentum_calculation 
-
-            # find derivative of total output error with respect to penultimate layer
-            for i in range(len(der_out)):
-                der_err_tot += self.layers[self.num_layers-1].neurons[i].current_weight[1] * self.layers[self.num_layers-1].neurons[i].derivative*der_out[i]
-        
-        # find derivative of total output error with respect to weights in hidden layers 
-        for i in range(self.num_layers-2,-1,-1):
-            for j in range(self.layers[i].num_neurons):
-                for k in range(len(self.layers[i].neurons[0].current_weight)):
-                    der_neur = self.layers[i].neurons[j].derivative * self.layers[i].neurons[j].weight_der[k] * der_err_tot
-
-                    # update new weight
-                    momentum_calculation = np.array(self.momentum * momentum_calculation) + np.array(eta) * der_neur
-                    self.layers[i].neurons[j].new_weight[k] = self.layers[i].neurons[j].current_weight[k] - momentum_calculation
-
-            # calculate new total multiplicative derivative for next layer
-            der_err_tot *= self.layers[i].neurons[0].weight_der[1]
-
-        self.__update_weights()
-
-    def classify_data(self, x):
-        output = np.empty([x.shape[0],1]) 
-        for i in range(x.shape[0]):
-            prob = self.forward_prop(x[i,:])
-            output[i] = np.argmax(prob) 
-        return output 
-
-    def repot_error(self, yhat, y):
-        # TODO: write a function that compares categorized data to actual output
-        print("verify accuracy")
-
-    def write_network_values(self, filename):
-        pickle.dump(self, open(filename, "wb"))
-        print("Network written to: %s" %(filename))
-
-    def print_weights(self):
-        for i, layer in enumerate(self.layers):
-            print("Layer %d"%(i))
-            for j, neuron in enumerate(layer.neurons):
-                print("Neuron %d"%(j))
-                for k, weight in enumerate(neuron.current_weight):
-                    print("%d: %.3f"%(k,weight))
-            print("\n")
-
-    def set_initial_conditions(self):
-         # create testing initial parameters
-         self.layers[0].neurons[0].current_weight[0] = 0.35
-         self.layers[0].neurons[0].current_weight[1] = 0.15
-         self.layers[0].neurons[0].current_weight[2] = 0.20
-
-         self.layers[0].neurons[1].current_weight[0] = 0.35
-         self.layers[0].neurons[1].current_weight[1] = 0.25
-         self.layers[0].neurons[1].current_weight[2] = 0.30
-         
-         self.layers[1].neurons[0].current_weight[0] = 0.60
-         self.layers[1].neurons[0].current_weight[1] = 0.40
-         self.layers[1].neurons[0].current_weight[2] = 0.45
-        
-         self.layers[1].neurons[1].current_weight[0] = 0.60
-         self.layers[1].neurons[1].current_weight[1] = 0.50
-         self.layers[1].neurons[1].current_weight[2] = 0.55
-
-
-class layer:
-    def __init__(self,num_inputs,num_neurons, activation):
-        self.num_neurons = num_neurons
-        self.num_inputs = num_inputs
-        self.sigma = None
-        self.activation = activation
-        self.neurons = [neuron(self.num_inputs,self.sigma) 
-                for i in range(self.num_neurons)]
-
-    def find_neuron_derivatives(self):
-        for neuron in self.neurons:
-            neuron.derivative = self.activation.derivative(neuron.output)
-
-class neuron:
-    def __init__(self,num_inputs,sigma):
-        self.output = 0 
-        self.net = 0 
-        self.weight_der = [None]*(num_inputs+1)  
-        self.current_weight = [None]*(num_inputs+1) #np.random.normal(0,sigma,[num_inputs+1,1])
-        self.new_weight = [None]*(num_inputs+1)
-        self.derivative = None
+    x = np.array([[],[]])
+    for i in range(N):
+        idx = np.random.randint(10)
+        if class_type == 0:
+            m = m0[:,idx]
+        elif class_type == 1:
+            m = m1[:,idx]
+        else:
+            print("not a proper classifier")
+            return 0 
+        x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
+    return x.T
 
 if __name__ == '__main__':
   main()
