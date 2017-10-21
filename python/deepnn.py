@@ -116,6 +116,7 @@ class NeuralNetwork:
     def train_data(self, X, Y):
         Yhat = self.forward_prop(X)
         dE_dH = (Yhat-Y).T
+        iterlayers = iter(self.layers[::-1])
 
         # back propagation
         if self.softmax is True:
@@ -128,9 +129,8 @@ class NeuralNetwork:
                     self.eta * dE_dWeight
             self.layers[-1].W += - self.layers[-1].momentum_matrix
             # dE_dH = (Yhat-(Y==1).astype(int))[0].T/Yhat.shape[0]
+            next(iterlayers)
 
-        iterlayers = iter(self.layers[::-1])
-        next(iterlayers)
         for layer in iterlayers:
             dE_dNet = np.dot(layer.der(layer.output),dE_dH.T) 
             dE_dWeight = (np.dot(dE_dNet,layer.weight_der))/layer.weight_der.shape[0]
