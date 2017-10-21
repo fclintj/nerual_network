@@ -11,11 +11,12 @@ from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
     num_inputs = 2
-    num_outputs = 3
+    num_outputs = 2
     batch_size = 200
-    epochs = 500
+    epochs = 5000
 
-    X,Y = pickle.load(open("./in_out.p","rb"))
+    # X,Y = pickle.load(open("./in_out.p","rb"))
+    # X,Y = get_moon_class_data() 
     
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
@@ -23,7 +24,8 @@ def main():
     
     num_neurons = 23
     # input layer
-    layers = [layer(num_inputs,num_neurons,sig)]
+    layers = [layer(num_inputs,20,sig)]
+    layers.append(layer(20,num_neurons,sig))
     layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
@@ -158,7 +160,7 @@ class NeuralNetwork:
             if i%print_tenth is 0 :
                 percent_complete += 1
                 print("%d%% MSE: %f"%(percent_complete, self.total_error[i]))
-        print("Total Mean Squared Error: %f"%(np.mean(self.error_array)))
+        # print("Total Mean Squared Error: %f"%(np.mean(self.error_array)))
 
     def train_data(self, X, Y):
         Yhat = self.forward_prop(X)
@@ -202,7 +204,7 @@ class NeuralNetwork:
         print("Network written to: %s" %(filename))
 
     def validate_results(self, Yhat, Y):
-        Yhat_enc = (np.arange(np.max(Yhat) + 1) == Yhat[:, None]).astype(float)
+        Yhat_enc = (np.arange(Y.shape[1]) == Yhat[:, None]).astype(float)
         num_err = np.sum(abs(Yhat_enc - Y))/2
         print("%d Mistakes. Training Accuracy: %.2f%%"%(int(num_err),
             (len(Yhat)-num_err)/len(Yhat)*100))
@@ -215,11 +217,6 @@ class NeuralNetwork:
         self.layers[0].W[0,:] = [0.1,0.1,0.01]
         self.layers[0].W[1,:] = [0.2,0.2,0.1 ]
         self.layers[0].W[2,:] = [0.3,0.3,0.1 ]
-
-        # self.layers[1].W[0,:] = [0.4,0.45,0.6]
-        # self.layers[1].W[1,:] = [0.5,0.55,0.6]
-        # self.layers[1].W[2,:] = [0.5,0.55,0.6]
-
         
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
