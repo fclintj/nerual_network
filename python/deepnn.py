@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pickle
+import time
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
@@ -14,27 +15,81 @@ def main():
     # softmax_test()
     
 def softmax_test():
-    num_inputs = 2 
-    num_outputs = 2
+    num_inputs = 3
+    num_outputs = 3
     batch_size = 1
-    epochs = 5000
+    epochs = 1 
     momentum = 0 
 
     # create the sigmoid activation function
     sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
     softmax = activation_function(stable_softmax_func,softmax_respect_der)
+    relu = activation_function(relu_func,relu_der)
     no_activation = activation_function(return_value,return_value)
 
     # create layer structure
-    layer0 = layer(num_inputs,2,sigmoid)
-    layer1 = layer(2,2,no_activation)
-    hidden_layers = [layer0, layer1]
+    layer0 = layer(num_inputs,3,relu)
+    layer1 = layer(3,3,sigmoid)
+    layer3 = layer(3,3,no_activation)
+
+    hidden_layers = [layer0, layer1, layer3]
 
     # create neural network framework
     # network = pickle.load(open("./classasgntrain1.p","rb"))
 
 
     network = neural_network(num_outputs,hidden_layers,"softmax",momentum)
+    network.set_initial_conditions_3()
+    
+    # data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    # x0 = data[:,0:2]
+    # x1 = data[:,2:4]
+    # data = data_frame(x0,x1)
+
+    x = [0.1,0.2,0.7]
+    y = [1,0,0]
+    network.train_data(x,y)
+    print(network.layers[0].neurons[0].output)
+    # network.print_weights()
+    # network.plot_error_array()
+
+    # yhat = network.classify_data(data.xtot)
+    # print(yhat)
+    # y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
+    # num_err = sum(abs(yhat - y))
+    # print("Percent of errors: %.4f"%(float(num_err)/data.N))
+    #
+    # test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
+    # yhat = network.classify_data(test_data.xtot)
+    # num_err = sum(abs(yhat - test_data.y))
+    # print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
+    #
+    # plot_boundaries(data,network.forward_prop) 
+
+
+def test_bilinear():
+    num_inputs = 2 
+    num_outputs = 2
+    batch_size = 100
+    epochs = 10 
+    momentum = 0 
+
+    # create the sigmoid activation function
+    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
+    softmax = activation_function(stable_softmax_func,softmax_respect_der)
+    relu = activation_function(relu_func,relu_der)
+    no_activation = activation_function(return_value,return_value)
+
+    # create layer structure
+    layer0 = layer(num_inputs,2,relu)
+    layer1 = layer(2,2,sigmoid)
+    hidden_layers = [layer0, layer1]
+
+    # create neural network framework
+    # network = pickle.load(open("./classasgntrain1.p","rb"))
+
+
+    network = neural_network(num_outputs,hidden_layers,"none",momentum)
     network.set_initial_conditions()
     # x = np.array([0.05,0.10])
     # y = np.array([0, 1])
@@ -44,55 +99,11 @@ def softmax_test():
     x1 = data[:,2:4]
     data = data_frame(x0,x1)
 
-
-    # network.train_network(data.xtot,data.class_tot,batch_size,epochs)
+    print(data.xtot.shape)
     print(data.class_tot)
-
-    network.backward_prop(data.xtot[i,:],network.forward_prop(data.xtot[i,:]),data.class_tot[i,:])
-
-    # print(network.train_data(data.xtot[0,:],data.class_tot[0,:]))
-    # print(network.classify_data(data.x0)) 
-
-    yhat = network.classify_data(data.xtot)
-    y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
-    num_err = sum(abs(yhat - y))
-    print("Percent of errors: %.4f"%(float(num_err)/data.N))
-
-    test_data = data_frame(gendata2(0,10000),gendata2(1,10000))
-    yhat = network.classify_data(test_data.xtot)
-    num_err = sum(abs(yhat - test_data.y))
-    print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
-
-    plot_boundaries(data,network.forward_prop) 
-
-def test_bilinear():
-    num_inputs = 2 
-    num_outputs = 2
-    batch_size = 800
-    epochs = 5
-    momentum = 0.9 
-
-    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
-    x0 = data[:,0:2]
-    x1 = data[:,2:4]
-    data = data_frame(x0,x1)
-
-
-    # create the sigmoid activation function
-    sigmoid = activation_function(sigmoid_func,sigmoid_derivative)
-    no_activation = activation_function(return_value,return_value)
-
-    # create layer structure
-    layer0 = layer(num_inputs,2,sigmoid)
-    layer1 = layer(2,2,sigmoid)
-    hidden_layers = [layer0, layer1]
-    # network = pickle.load(open("./classasgntrain1.p","rb"))
-
-    # create neural network framework
-    network = neural_network(num_outputs,hidden_layers,"sigmoid",momentum)
     network.train_network(data.xtot,data.class_tot,batch_size,epochs)
+
     network.plot_error_array()
-    # network.write_network_values("classasgntrain1.p")
 
     yhat = network.classify_data(data.xtot)
     y = np.r_[np.ones([data.N0,1]),np.zeros([data.N1,1])] 
@@ -103,7 +114,6 @@ def test_bilinear():
     yhat = network.classify_data(test_data.xtot)
     num_err = sum(abs(yhat - test_data.y))
     print("Percent of errors: %.5f"%(float(num_err)/test_data.N))
-    
 
     plot_boundaries(data,network.forward_prop) 
 
@@ -242,9 +252,23 @@ def print_images(ordered,m,n):
 def return_value(x):
     return x
 
+
+def relu_func(x):
+    return np.maximum(0,x)
+    
+def relu_der(x):
+    if x > 0:
+        return x
+    else:
+        return 0
+
 def stable_softmax_func(x):
     shiftx = x - np.max(x)
     exps = np.exp(shiftx)
+    return exps / np.sum(exps)
+
+def softmax_func(x):
+    exps = np.exp(x)
     return exps / np.sum(exps)
 
 def softmax_respect_der(y_out,x,x_element):
@@ -315,14 +339,15 @@ class neural_network:
         return output 
 
     def train_network(self, x, y, batch_size, epochs):
+        count = 0
         batch = np.random.randint(0,len(x),batch_size)
         for i in range(epochs):
             for sample in batch:
                 self.train_data(x[sample],y[sample]) 
-                if i%100 is 0:
-                    self.error_array.append(sum(self.total_error)) 
+                if i%10 is 0:
+                    self.error_array.append(self.total_error)
 
-            print("Total error: %f"%(sum(self.total_error)))
+            print("Total error: %f"%(self.total_error))
 
     def plot_error_array(self):
         plt.plot(self.error_array) 
@@ -333,7 +358,7 @@ class neural_network:
         yhat = np.array(yhat).reshape((len(yhat),1))
         y = np.array(y).reshape((len(y),1))
         self.backward_prop(x,yhat,y)
-        self.total_error = 0.5*(yhat - y)*(yhat - y)
+        self.total_error = sum(0.5*(yhat - y)*(yhat - y))
 
     def forward_prop(self, data):
         X = np.array(data).reshape((len(data),1))
@@ -359,24 +384,31 @@ class neural_network:
         der_err_tot = 0
         # find weights for last layer if softmax
         if self.output_layer == "softmax":
+            neuron_sum = 0
+            for neuron in self.layers[self.num_layers-1].neurons:
+                neuron_sum += np.exp(neuron.net) 
+
             for i, neuron in enumerate(self.layers[self.num_layers-1].neurons):
                 for j in range(len(neuron.weight_der)):
                     der_neur = 0
                     for k in range(self.num_outputs):
                         if i is k:
-                            der_neur += der_out[k] * (yhat[k]*(1-neuron.net)) * neuron.weight_der[j]
+                            der_neur += der_out[k] * (np.exp(neuron.net)*(neuron_sum-np.exp(neuron.net)))/(neuron_sum*neuron_sum)
+                            # der_neur += der_out[k] * ((1-1.0/np.exp(neuron_sum))) * neuron.weight_der[j]
                         else:
-                            der_neur += der_out[k] * (-yhat[k]*neuron.net) * neuron.weight_der[j]
-
+                            der_neur += der_out[k] * np.exp(neuron.net) 
+                            # der_neur += der_out[k] * (-1.0/np.exp(neuron_sum)) * neuron.weight_der[j]
                     # update new weight
                     momentum_calculation = self.momentum * momentum_calculation + eta * der_neur
                     neuron.new_weight[j] = neuron.current_weight[j] - momentum_calculation 
 
              # find derivative of total output error with respect to penultimate layer
-            der_err_tot += der_out[0] * (yhat[k]*(1-self.layers[self.num_layers-1].neurons[0].net)) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+            # der_err_tot += der_out[0] * (1-1.0/np.exp(neuron_sum)) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+
+            der_out[0] * (np.exp(self.layers[self.num_layers-1].neurons[0].net) * (neuron_sum-np.exp(self.layers[self.num_layers-1].neurons[0].net)))/(neuron_sum*neuron_sum)
 
             for i in range(1,len(der_out)):
-                der_err_tot += der_out[i] * (-yhat[i]*self.layers[self.num_layers-1].neurons[0].net) * self.layers[self.num_layers-1].neurons[0].weight_der[1]
+                der_err_tot += der_out[i] * (np.exp(self.layers[self.num_layers-1].neurons[i].net) *(neuron_sum-np.exp(self.layers[self.num_layers-1].neurons[i].net)))/(neuron_sum*neuron_sum)
 
         # find weights for last layer
         else: 
@@ -449,7 +481,52 @@ class neural_network:
          self.layers[1].neurons[1].current_weight[1] = 0.50
          self.layers[1].neurons[1].current_weight[2] = 0.55
 
+    def set_initial_conditions_3(self):
+         # create testing initial parameters
+         self.layers[0].neurons[0].current_weight[0] = 1
+         self.layers[0].neurons[0].current_weight[1] = 0.1
+         self.layers[0].neurons[0].current_weight[2] = 0.2
+         self.layers[0].neurons[0].current_weight[3] = 0.3
 
+         self.layers[0].neurons[1].current_weight[0] = 1
+         self.layers[0].neurons[1].current_weight[1] = 0.3
+         self.layers[0].neurons[1].current_weight[2] = 0.2
+         self.layers[0].neurons[1].current_weight[3] = 0.7
+         
+         self.layers[0].neurons[2].current_weight[0] = 1
+         self.layers[0].neurons[2].current_weight[1] = 0.4
+         self.layers[0].neurons[2].current_weight[2] = 0.3
+         self.layers[0].neurons[2].current_weight[3] = 0.9
+         
+         self.layers[1].neurons[0].current_weight[0] = 1
+         self.layers[1].neurons[0].current_weight[1] = 0.2
+         self.layers[1].neurons[0].current_weight[2] = 0.3
+         self.layers[1].neurons[0].current_weight[3] = 0.5
+
+         self.layers[1].neurons[1].current_weight[0] = 1
+         self.layers[1].neurons[1].current_weight[1] = 0.3
+         self.layers[1].neurons[1].current_weight[2] = 0.5
+         self.layers[1].neurons[1].current_weight[3] = 0.7
+         
+         self.layers[1].neurons[2].current_weight[0] = 1
+         self.layers[1].neurons[2].current_weight[1] = 0.6
+         self.layers[1].neurons[2].current_weight[2] = 0.4
+         self.layers[1].neurons[2].current_weight[3] = 0.8
+
+         self.layers[2].neurons[0].current_weight[0] = 1
+         self.layers[2].neurons[0].current_weight[1] = 0.1
+         self.layers[2].neurons[0].current_weight[2] = 0.4
+         self.layers[2].neurons[0].current_weight[3] = 0.8
+
+         self.layers[2].neurons[1].current_weight[0] = 1
+         self.layers[2].neurons[1].current_weight[1] = 0.3
+         self.layers[2].neurons[1].current_weight[2] = 0.7
+         self.layers[2].neurons[1].current_weight[3] = 0.2
+         
+         self.layers[2].neurons[2].current_weight[0] = 1
+         self.layers[2].neurons[2].current_weight[1] = 0.5
+         self.layers[2].neurons[2].current_weight[2] = 0.2
+         self.layers[2].neurons[2].current_weight[3] = 0.9
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
         self.num_neurons = num_neurons
@@ -466,7 +543,7 @@ class layer:
 class neuron:
     def __init__(self,num_inputs,sigma):
         self.output = 0 
-        self.net = 0 
+        self.weight_der = [None]*(num_inputs+1)  
         self.weight_der = [None]*(num_inputs+1)  
         self.current_weight = [None]*(num_inputs+1) #np.random.normal(0,sigma,[num_inputs+1,1])
         self.new_weight = [None]*(num_inputs+1)
