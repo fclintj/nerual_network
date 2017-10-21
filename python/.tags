@@ -4,113 +4,65 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+NeuralNetwork	deepnn.py	/^class NeuralNetwork:$/;"	c
 X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
 Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
+__init__	deepnn.py	/^                 eta=0.5, scale=0.01  ):$/;"	m	class:NeuralNetwork
 __init__	deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
-__init__	deepnn.py	/^    def __init__(self, num_outputs, layers, output_layer, momentum):$/;"	m	class:neural_network
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
-__init__	deepnn.py	/^    def __init__(self,num_inputs,sigma):$/;"	m	class:neuron
-__init__	matrix/deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
-__init__	matrix/deepnn.py	/^    def __init__(self, num_outputs, layers, output_layer, momentum):$/;"	m	class:neural_network
-__init__	matrix/deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
-__init__	matrix/deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
-__init__	matrix/deepnn.py	/^    def __init__(self,num_inputs,sigma):$/;"	m	class:neuron
-__layer_opperations	deepnn.py	/^    def __layer_opperations(self,X,layer):$/;"	m	class:neural_network	file:
-__layer_opperations	matrix/deepnn.py	/^    def __layer_opperations(self,X,layer):$/;"	m	class:neural_network	file:
-__set_layer_sigma	deepnn.py	/^    def __set_layer_sigma(self):$/;"	m	class:neural_network	file:
-__set_layer_sigma	matrix/deepnn.py	/^    def __set_layer_sigma(self):$/;"	m	class:neural_network	file:
-__update_weights	deepnn.py	/^    def __update_weights(self):$/;"	m	class:neural_network	file:
-__update_weights	matrix/deepnn.py	/^    def __update_weights(self):$/;"	m	class:neural_network	file:
+__set_GRV_starting_weights	deepnn.py	/^    def __set_GRV_starting_weights(self):$/;"	m	class:NeuralNetwork	file:
 accuracy	tensor_flow.py	/^accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))$/;"	v
 activation_function	deepnn.py	/^class activation_function:$/;"	c
-activation_function	matrix/deepnn.py	/^class activation_function:$/;"	c
-backward_prop	deepnn.py	/^    def backward_prop(self,x,yhat,y):$/;"	m	class:neural_network
-backward_prop	matrix/deepnn.py	/^    def backward_prop(self,x,yhat,y):$/;"	m	class:neural_network
 batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
 biases	tensor_flow.py	/^biases = {$/;"	v
-classify_data	deepnn.py	/^    def classify_data(self, x):$/;"	m	class:neural_network
-classify_data	matrix/deepnn.py	/^    def classify_data(self, x):$/;"	m	class:neural_network
+classify_data	deepnn.py	/^    def classify_data(self, X):$/;"	m	class:NeuralNetwork
 correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
 data_frame	deepnn.py	/^class data_frame:$/;"	c
-data_frame	matrix/deepnn.py	/^class data_frame:$/;"	c
+der	deepnn.py	/^    def der(self, X):$/;"	m	class:layer
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
-derivative	matrix/deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
 display_step	tensor_flow.py	/^display_step = 1$/;"	v
-find_neuron_derivatives	deepnn.py	/^    def find_neuron_derivatives(self):$/;"	m	class:layer
-find_neuron_derivatives	matrix/deepnn.py	/^    def find_neuron_derivatives(self):$/;"	m	class:layer
-forward_prop	deepnn.py	/^    def forward_prop(self, data):$/;"	m	class:neural_network
-forward_prop	matrix/deepnn.py	/^    def forward_prop(self, data):$/;"	m	class:neural_network
+forward	deepnn.py	/^    def forward(self, X):$/;"	m	class:layer
+forward_prop	deepnn.py	/^    def forward_prop(self, X):$/;"	m	class:NeuralNetwork
 function	deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
-function	matrix/deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
 gendata2	deepnn.py	/^def gendata2(class_type,N):$/;"	f
-gendata2	matrix/deepnn.py	/^def gendata2(class_type,N):$/;"	f
+get_2_class_data	deepnn.py	/^def get_2_class_data():$/;"	f
+get_3_class_data	deepnn.py	/^def get_3_class_data():$/;"	f
+get_class_data	deepnn.py	/^def get_class_data():$/;"	f
 get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
-get_ordered	matrix/deepnn.py	/^def get_ordered(X_train):$/;"	f
 init	tensor_flow.py	/^init = tf.global_variables_initializer()$/;"	v
 layer	deepnn.py	/^class layer:$/;"	c
-layer	matrix/deepnn.py	/^class layer:$/;"	c
 learning_rate	tensor_flow.py	/^learning_rate = 0.0$/;"	v
 logits	tensor_flow.py	/^logits = neural_net(X)$/;"	v
 loss_op	tensor_flow.py	/^loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits($/;"	v
 main	deepnn.py	/^def main():$/;"	f
-main	matrix/deepnn.py	/^def main():$/;"	f
 mnist	tensor_flow.py	/^mnist = input_data.read_data_sets("\/tmp\/data\/", one_hot=True)$/;"	v
 n_hidden_1	tensor_flow.py	/^n_hidden_1 = 2 # 1st layer number of neurons$/;"	v
 n_hidden_2	tensor_flow.py	/^n_hidden_2 = 2 # 2nd layer number of neurons$/;"	v
 neural_net	tensor_flow.py	/^def neural_net(x):$/;"	f
-neural_network	deepnn.py	/^class neural_network:$/;"	c
-neural_network	matrix/deepnn.py	/^class neural_network:$/;"	c
-neuron	deepnn.py	/^class neuron:$/;"	c
-neuron	matrix/deepnn.py	/^class neuron:$/;"	c
 num_classes	tensor_flow.py	/^num_classes = 2 # MNIST total classes (0-9 digits)$/;"	v
 num_input	tensor_flow.py	/^num_input = 2 # MNIST data input (img shape: 28*28)$/;"	v
 num_steps	tensor_flow.py	/^num_steps = 1$/;"	v
 optimizer	tensor_flow.py	/^optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)$/;"	v
 plot_boundaries	deepnn.py	/^def plot_boundaries(data,equation):$/;"	f
-plot_boundaries	matrix/deepnn.py	/^def plot_boundaries(data,equation):$/;"	f
 plot_data	deepnn.py	/^def plot_data(data):$/;"	f
-plot_data	matrix/deepnn.py	/^def plot_data(data):$/;"	f
-plot_error_array	deepnn.py	/^    def plot_error_array(self):$/;"	m	class:neural_network
-plot_error_array	matrix/deepnn.py	/^    def plot_error_array(self):$/;"	m	class:neural_network
+plot_error	deepnn.py	/^    def plot_error(self):$/;"	m	class:NeuralNetwork
 prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
 print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
-print_images	matrix/deepnn.py	/^def print_images(ordered,m,n):$/;"	f
-print_weights	deepnn.py	/^    def print_weights(self):$/;"	m	class:neural_network
-print_weights	matrix/deepnn.py	/^    def print_weights(self):$/;"	m	class:neural_network
-relu_der	deepnn.py	/^def relu_der(x):$/;"	f
-relu_der	matrix/deepnn.py	/^def relu_der(x):$/;"	f
-relu_func	deepnn.py	/^def relu_func(x):$/;"	f
-relu_func	matrix/deepnn.py	/^def relu_func(x):$/;"	f
-repot_error	deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
-repot_error	matrix/deepnn.py	/^    def repot_error(self, yhat, y):$/;"	m	class:neural_network
-return_value	deepnn.py	/^def return_value(x):$/;"	f
-return_value	matrix/deepnn.py	/^def return_value(x):$/;"	f
-set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:neural_network
-set_initial_conditions	matrix/deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:neural_network
-set_initial_conditions_3	deepnn.py	/^    def set_initial_conditions_3(self):$/;"	m	class:neural_network
-sigmoid_derivative	deepnn.py	/^def sigmoid_derivative(x):$/;"	f
-sigmoid_derivative	matrix/deepnn.py	/^def sigmoid_derivative(x):$/;"	f
+relu_der	deepnn.py	/^def relu_der(X):$/;"	f
+relu_func	deepnn.py	/^def relu_func(X):$/;"	f
+return_value	deepnn.py	/^def return_value(X):$/;"	f
+set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:NeuralNetwork
+set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:layer
+sigmoid_der	deepnn.py	/^def sigmoid_der(x):$/;"	f
 sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
-sigmoid_func	matrix/deepnn.py	/^def sigmoid_func(x):$/;"	f
 softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
-softmax_func	matrix/deepnn.py	/^def softmax_func(x):$/;"	f
-softmax_respect_der	deepnn.py	/^def softmax_respect_der(y_out,x,x_element):$/;"	f
-softmax_respect_der	matrix/deepnn.py	/^def softmax_respect_der(y_out,x,x_element):$/;"	f
-softmax_test	deepnn.py	/^def softmax_test():$/;"	f
-softmax_test	matrix/deepnn.py	/^def softmax_test():$/;"	f
+stable_softmax	deepnn.py	/^    def stable_softmax(self, Z):$/;"	m	class:NeuralNetwork
 stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
-stable_softmax_func	matrix/deepnn.py	/^def stable_softmax_func(x):$/;"	f
-test_bilinear	deepnn.py	/^def test_bilinear():$/;"	f
-test_bilinear	matrix/deepnn.py	/^def test_bilinear():$/;"	f
-test_number	deepnn.py	/^def test_number():$/;"	f
-test_number	matrix/deepnn.py	/^def test_number():$/;"	f
-train_data	deepnn.py	/^    def train_data(self, x, y):$/;"	m	class:neural_network
-train_data	matrix/deepnn.py	/^    def train_data(self, x, y):$/;"	m	class:neural_network
-train_network	deepnn.py	/^    def train_network(self, x, y, batch_size, epochs):$/;"	m	class:neural_network
-train_network	matrix/deepnn.py	/^    def train_network(self, x, y, batch_size, epochs):$/;"	m	class:neural_network
+train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
+train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epochs, MSE_freq=30):$/;"	m	class:NeuralNetwork
 train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v
 um_neurons	classasgntrain1.p	/^sbsS'num_neurons'$/;"	f
+validate_results	deepnn.py	/^    def validate_results(self, Yhat, Y):$/;"	m	class:NeuralNetwork
 weights	tensor_flow.py	/^weights = {$/;"	v
-write_network_values	deepnn.py	/^    def write_network_values(self, filename):$/;"	m	class:neural_network
-write_network_values	matrix/deepnn.py	/^    def write_network_values(self, filename):$/;"	m	class:neural_network
+write_network_values	deepnn.py	/^    def write_network_values(self, filename):$/;"	m	class:NeuralNetwork
