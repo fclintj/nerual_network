@@ -21,9 +21,9 @@ def main():
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 2
+    num_neurons = 5
     # input layer
-    layers = [layer(num_inputs,num_neurons,sig)]
+    layers = [layer(num_inputs,num_neurons,relu)]
     layers.append(layer(num_neurons,num_outputs,sig))
 
     # create neural network
@@ -39,7 +39,7 @@ def main():
     # network.write_network_values("network_first.p")
 
     # plot error
-    # network.plot_error()    
+    network.plot_error()    
 
 def get_2_class_data():
     X = np.array([[0.05, 0.1],
@@ -83,8 +83,8 @@ def get_class_data():
     return data.xtot,data.class_tot
 
 class NeuralNetwork:
-    def __init__(self,    layers,   softmax=True,  momentum=0, \
-                 eta=0.5, scale=0.01  ):
+    def __init__(self,    layers,   softmax=True,  momentum=0.8, \
+                 eta=0.1, scale=0.01  ):
 
         self.softmax=softmax
         self.num_layers = len(layers)
@@ -174,12 +174,9 @@ class NeuralNetwork:
         # self.error_array.append(-np.mean(np.sum(np.log(Yhat)*Y)))
         self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
 
-    def stable_softmax(self, Z):
-        Z = np.maximum(Z, -1e3)
-        Z = np.minimum(Z, 1e3)
-        numerator = np.exp(Z)
-        denom = np.sum(numerator, axis=1).reshape((-1,1))
-        return numerator / denom 
+    def stable_softmax(self, X):
+        exp_norm = np.exp(X - np.max(X))
+        return exp_norm / np.sum(exp_norm, axis=1).reshape((-1,1))
 
     def plot_error(self):
         plt.plot(range(len(self.total_error)), self.total_error)
