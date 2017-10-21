@@ -21,10 +21,10 @@ def main():
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 3
+    num_neurons = 23
     # input layer
-    layers = [layer(num_inputs,num_outputs,no_activation)]
-    # layers.append(layer(num_neurons,num_outputs,no_activation))
+    layers = [layer(num_inputs,num_neurons,sig)]
+    layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
     network = NeuralNetwork(layers) 
@@ -173,7 +173,7 @@ class NeuralNetwork:
 
             self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
             self.layers[-1].momentum_matrix = dE_dWeight
-            # dE_dH = (Yhat-(Y==1).astype(int)).T/Yhat.shape[0]
+            dE_dH = (Yhat-(Y==1).astype(int)).T[0,:]/Yhat.shape[0]
             next(iterlayers)
 
         for layer in iterlayers:

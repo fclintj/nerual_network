@@ -28,8 +28,9 @@ function	deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
 gendata2	deepnn.py	/^def gendata2(class_type,N):$/;"	f
 get_2_class_data	deepnn.py	/^def get_2_class_data():$/;"	f
 get_3_class_data	deepnn.py	/^def get_3_class_data():$/;"	f
-get_class_data	deepnn.py	/^def get_class_data():$/;"	f
+get_moon_class_data	deepnn.py	/^def get_moon_class_data():$/;"	f
 get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
+get_sprial_class_data	deepnn.py	/^def get_sprial_class_data():$/;"	f
 init	tensor_flow.py	/^init = tf.global_variables_initializer()$/;"	v
 layer	deepnn.py	/^class layer:$/;"	c
 learning_rate	tensor_flow.py	/^learning_rate = 0.0$/;"	v
