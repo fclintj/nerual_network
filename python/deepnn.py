@@ -14,7 +14,6 @@ def main():
     num_outputs = 10 
     batch_size = 500
     epochs = 70
-    
 
     mnist = input_data.read_data_sets("/tmp/data/") # or wherever you want
 
