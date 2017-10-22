@@ -6,104 +6,64 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 from   tensorflow.examples.tutorials.mnist import input_data
+import time
 
 def main():
-    num_inputs = 2
-    num_outputs= 2 
-    batch_size = 200
-    epics = 800
+    num_inputs = 784 
+    num_outputs= 10 
+    batch_size = 100
+    epochs = 40 
 
-    # X,Y = pickle.load(open("./in_out.p","rb"))
-    # X,Y,X_test,Y_test = get_classasgn_80_20() 
-    X,Y = get_moon_class_data() 
-    X_test,Y_test = get_moon_gendata() 
-    # X,Y = get_mnist_train("./data")
-    
+    # open mnist data
+    X,Y,X_test,Y_test = get_mnist_train("./data")
+
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
-
-    num_neurons = 5 
-    # input layer
-    layers = [layer(num_inputs,num_neurons,sig)]
-    layers.append(layer(num_neurons,num_outputs,sig))
-
-    # create neural network
-    network = NeuralNetwork(layers) 
-
-    # train network
-    network.train_network(X,Y,batch_size,epics)
-
-    # classify data
-    Yhat = network.classify_data(X_test)
-    network.validate_results(Yhat,Y_test) 
     
-    plot_data(X[0:100],X[100:200])
-    xtot = np.r_[X,X_test] 
-    xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
-    ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
-    plot_boundaries(xlim,ylim,network.classify_data)
-    plt.show()
+    num_neurons = 300 
+
+    # first layer tests
+    layers0 = [layer(num_inputs,num_neurons,relu)]
+    layers0.append(layer(num_neurons,num_outputs,no_activation))
+
+    # second layer tests 
+    layers1 = [layer(num_inputs,300,relu)]
+    layers1.append(layer(300,100,relu))
+    layers1.append(layer(100,num_outputs,no_activation))
+
+    layer_testbench = [layers0,layers1] 
+    message = ["Layer with 1 hidden network (300 neurons).\n",
+                "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
+
+    file = open('../report/media/mnist/network_statistics.txt',"w") 
+    for index, layers in enumerate(layer_testbench):
+        file.write(message[index])
+        for i in np.arange(0,0.9,0.8): 
+            for j in np.arange(0.2,0.7,0.2):
+                print("Currently on layer " + str(index) + " momentum " + str(i) + " step size " + str(j))
+                # create neural network
+                network = NeuralNetwork(layers,eta=j,momentum=i) 
+
+                start_time = time.time()
+                # train network
+                network.train_network(X,Y,batch_size,epochs)
+                end_time = time.time()
+                # classify data
+                Yhat = network.classify_data(X_test)
+                training_accuracy = network.validate_results(Yhat,Y_test) 
+                file.write('mo-' + str(i) + '-eta-' + str(j) + "\n")
+                file.write("Percent Correct: " + str(training_accuracy) + "%\n")
+                file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
+
+                # plot error
+                network.plot_error()    
+                plt.savefig('../report/media/mnist/lay-' + str(index) + 
+                        '-mo-' + str(i) + '-eta-' + str(j) + 
+                        '.pdf',bbox_inches='tight')
     
-    # plot error
-    network.plot_error()    
-    plt.show()
-
-def get_mnist_train(file_path):
-    mnist = input_data.read_data_sets(file_path)
-    X = mnist.train.images
-    y = mnist.train.labels.astype("int")
-    Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
-    return X,Y 
-
-def get_2_class_data():
-    X = np.array([[0.05, 0.1],
-                  [0.07, 0.1],
-                  [0.05, 0.1],
-                  [0.05, 0.1],
-                  [0.05, 0.1]])
-
-    Y = np.array([[0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99]])
-    return X,Y
-
-def get_3_class_data():
-    X = np.array([[0.05, 0.1],
-                  [0.07, 0.3],
-                  [0.09, 0.5],
-                  [0.05, 0.1]])
-
-    Y = np.array([[1, 0, 0],
-                  [0, 1, 0],
-                  [0, 0, 1],
-                  [1, 0, 0]])
-    return X,Y
-
-def get_sprial_class_data():
-    np.random.seed(0)
-    N = 100 # number of points per class
-    D = 2 # dimensionality
-    K = 3 # number of classes
-    X = np.zeros((N*K,D))
-    y = np.zeros(N*K, dtype='uint8')
-    for j in xrange(K):
-        ix = range(N*j,N*(j+1))
-        r = np.linspace(0.0,1,N) # radius
-        t = np.linspace(j*4,(j+1)*4,N) + np.random.randn(N)*0.2 # theta
-        X[ix] = np.c_[r*np.sin(t), r*np.cos(t)]
-        y[ix] = j
-    # fig = plt.figure()
-    # plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral)
-    # plt.xlim([-1,1])
-    # plt.ylim([-1,1])
-    Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
-    return X,Y
-
 class NeuralNetwork:
-    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=10):
+    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=5):
         self.softmax=softmax
         self.num_layers = len(layers)
         self.num_outputs = layers[self.num_layers-1].num_neurons
@@ -141,21 +101,23 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epics):
+    def train_network(self, X, Y, batch_size, epochs):
         print("Training Data...")
 
-        if epics > 5000:
-            print_frequency = epics/100
+        if epochs > 5000:
+            print_frequency = epochs/100
             print(print_frequency)
         else:
-            print_frequency = epics/10
+            print_frequency = epochs/10
+            if print_frequency is 0:
+                print_frequency += 1
         
-        for i in range(epics):
+        for i in range(epochs):
             batch = np.random.randint(0,X.shape[0],batch_size)
             # self.train_data(X[batch],Y[batch]) 
             self.train_data(X,Y) 
             if i%print_frequency is 0:
-                print("Epic %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
+                print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
          
         # create error plot
         print("Final MSE: %f"%(np.mean(self.error_array[-self.MSE_freq:])))
@@ -201,7 +163,6 @@ class NeuralNetwork:
         plt.title("Mean Squared Error")
         plt.xlabel("Average MSE per %d training"%(self.MSE_freq))
         plt.ylabel("Percent")
-        plt.show()
 
     def write_network_values(self, filename):
         pickle.dump(self, open(filename, "we"))
@@ -210,9 +171,10 @@ class NeuralNetwork:
     def validate_results(self, Yhat, Y):
         Yhat_enc = (np.arange(Y.shape[1]) == Yhat[:, None]).astype(float)
         num_err = np.sum(abs(Yhat_enc - Y))/2
-        print("%d Mistakes. Training Accuracy: %.2f%%"%(int(num_err),
-            (len(Yhat)-num_err)/len(Yhat)*100))
-
+        training_accuracy = (len(Yhat)-num_err)/len(Yhat)*100
+        print("%d Mistakes. Training Accuracy: %.2f%%"%(int(num_err),training_accuracy))
+        return training_accuracy
+        
     def set_initial_conditions(self):
         # self.layers[0].W[0,:] = [0.15,0.2,0.35]
         # self.layers[0].W[1,:] = [0.25,0.3,0.35]
@@ -407,6 +369,62 @@ def print_digits(X,ordered,m,n):
             ax[i][j].axis("off")
 
     plt.show()
+
+def get_mnist_train(file_path):
+    mnist = input_data.read_data_sets(file_path)
+    X = mnist.train.images
+    y = mnist.train.labels.astype("int")
+    Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
+    X_test = mnist.test.images
+    y_test = mnist.test.labels.astype("int")
+    Y_test = (np.arange(np.max(y_test) + 1) == y_test[:, None]).astype(float)
+    return X,Y,X_test,Y_test
+
+def get_2_class_data():
+    X = np.array([[0.05, 0.1],
+                  [0.07, 0.1],
+                  [0.05, 0.1],
+                  [0.05, 0.1],
+                  [0.05, 0.1]])
+
+    Y = np.array([[0.01, 0.99],
+                  [0.01, 0.99],
+                  [0.01, 0.99],
+                  [0.01, 0.99],
+                  [0.01, 0.99]])
+    return X,Y
+
+def get_3_class_data():
+    X = np.array([[0.05, 0.1],
+                  [0.07, 0.3],
+                  [0.09, 0.5],
+                  [0.05, 0.1]])
+
+    Y = np.array([[1, 0, 0],
+                  [0, 1, 0],
+                  [0, 0, 1],
+                  [1, 0, 0]])
+    return X,Y
+
+def get_sprial_class_data():
+    np.random.seed(0)
+    N = 100 # number of points per class
+    D = 2 # dimensionality
+    K = 3 # number of classes
+    X = np.zeros((N*K,D))
+    y = np.zeros(N*K, dtype='uint8')
+    for j in xrange(K):
+        ix = range(N*j,N*(j+1))
+        r = np.linspace(0.0,1,N) # radius
+        t = np.linspace(j*4,(j+1)*4,N) + np.random.randn(N)*0.2 # theta
+        X[ix] = np.c_[r*np.sin(t), r*np.cos(t)]
+        y[ix] = j
+    # fig = plt.figure()
+    # plt.scatter(X[:, 0], X[:, 1], c=y, s=40, cmap=plt.cm.Spectral)
+    # plt.xlim([-1,1])
+    # plt.ylim([-1,1])
+    Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
+    return X,Y
 
 if __name__ == '__main__':
   main()
