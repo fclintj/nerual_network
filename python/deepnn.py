@@ -27,7 +27,7 @@ def main():
     
     num_neurons = 300 
     # input layer
-    layers = [layer(num_inputs,num_neurons,sig)]
+    layers = [layer(num_inputs,num_neurons,relu)]
     layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
@@ -147,7 +147,7 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epics, MSE_freq=30):
+    def train_network(self, X, Y, batch_size, epics, MSE_freq=10):
         print("Training Data...")
 
         if epics > 5000:
@@ -169,14 +169,6 @@ class NeuralNetwork:
             self.error_plot.append(np.mean(plot[i:i+MSE_freq]))
         self.error_plot = self.error_plot[::-1]
 
-            # if j%MSE_freq is 0:
-            #     self.error_plot.append(np.mean(self.error_array))
-            #     self.error_array = []
-            # if i%print_tenth is 0 :
-            #     percent_complete += 1
-            #     print("%d%% MSE: %f"%(percent_complete, self.error_plot[i]))
-        # print("Total Mean Squared Error: %f"%(np.mean(self.error_array)))
-
     def train_data(self, X, Y):
         Yhat = self.forward_prop(X)
         dE_dH = (Yhat-Y).T
@@ -185,8 +177,7 @@ class NeuralNetwork:
         # back propagation
         if self.softmax is True:
             dE_dWeight = -np.dot((Y-Yhat).T,self.layers[-1].weight_der) / \
-                        self.layers[-1].weight_der.shape[0] #+ \
-                        # self.scale * self.layers[-1].W
+                        self.layers[-1].weight_der.shape[0]
 
             self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
             self.layers[-1].momentum_matrix = dE_dWeight

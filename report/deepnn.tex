@@ -1,0 +1,281 @@
+\title { Deep Neural Networks  }
+\author{ Clint Ferrin          }
+\date  { Mon Oct 23, 2017      }
+\def\class { Neural Networks: ECE 5930 }
+\documentclass{article}\makeatletter
+
+\newcommand{\main} {
+   % document setup
+   \pageSetup
+   \createTitlePage
+   \includeHeader
+   \createTableOfContents
+
+   % content
+   \summary
+   \program
+   \twoclass
+   \tenclass
+}
+
+%  ┌────────────────────────┐
+%  │     Extra Packages     │
+%  └────────────────────────┘
+    % \usepackage{fontspec}   % allows Unicode in XeLaTex
+    % \setmainfont{FreeSerif} % introduction to fonts below 
+    % https://tex.stackexchange.com/questions/320096/xelatex-fontspec-cannot-find-fonts 
+    \usepackage{ucharclasses} % allows Unicode in XeLaTex
+    \usepackage[utf8]{inputenc}	% allows new character options
+    \usepackage[a4paper]{geometry}   % Paper dimensions and margins
+    \usepackage{fancyhdr}   % include document header
+    \usepackage{amsmath}    % allows equations to be split
+    \usepackage{bm}         % use of bold characters in math mode
+    \usepackage{enumitem}   % create lists
+    \usepackage{graphicx}	% manage images and graphics
+    \usepackage{hyperref}	% creates hyper-link color options
+    \usepackage{cleveref}	% (\Cref) include "Figure" on \reff 
+    \usepackage{xparse}     % include high performing functions 
+    \usepackage{xstring}    % StrSubstitute replace character
+    \usepackage{floatrow}	% allows placement of figures [H]
+    \usepackage{url}    	% package for url links
+    \usepackage{titletoc}   % change Table of Contents settings
+    \usepackage{caption}    % removes figure from LoF: \caption[]{}
+    \usepackage{listings, lstautogobble} % includes ability to input code
+    \usepackage{color}      % include colors for 
+    \usepackage{courier}    % courier font for listings
+    \usepackage{etoolbox}
+    \usepackage{tabulary}	% columns size of their contents (on page)
+    \usepackage{booktabs}   % allows for \toprule in tables
+
+    \definecolor{mygreen}{RGB}{28,172,0}	% custom defined colors
+    \definecolor{mylilas}{RGB}{170,55,241}
+    \definecolor{mymauve}{rgb}{0.58,0,0.82}
+    \definecolor{light-gray}{gray}{0.95} %the shade of grey that stack exchange uses
+
+    \lstset {
+        language=Python,
+        backgroundcolor = \color{light-gray},
+        breaklines		= true,
+        keywordstyle    = \color{blue},
+        morekeywords    = [2]{1}, keywordstyle=[2]{\color{black}},
+        identifierstyle = \color{black},
+        stringstyle     = \color{mylilas},
+        commentstyle    = \color{mygreen},
+        numbers         = left,
+        numberstyle     = {\tiny \color{black}},	% size of the numbers
+        numbersep       = 6pt, 						% distance of numbers from text
+        emph            = [1]{as, for, end, break}, % bold for, end, break...
+        emphstyle 		= [1]\color{red}, 			% emphasis
+        basicstyle		= \footnotesize\ttfamily,	% set font to courier
+        frameround      = ffff,                     % TR, BR, BL, TL. t(round)|f(flat)
+        frame           = single,                   % single line all around
+        showstringspaces= false,                    % blank spaces appear as written
+        autogobble      = true
+    }
+
+%  ┌────────────────────────┐
+%  │      Common Tasks      │
+%  └────────────────────────┘
+    \DeclareDocumentCommand{\commontasks}{m} {
+        \href{https://drive.google.com/open?id=0B5NW7S3txe5UTE0xSHJHNWxJbEE}{\underline{this link}} 
+        \texttt{PYTHON}
+        \lstinputlisting[language=Python]{../python/3_linear.py}
+
+        % two figures side by side
+        \begin{figure}[H]
+            \includegraphics[width=.45\linewidth]{./media/1-nearest.pdf}\hfill 
+            \includegraphics[width=.45\linewidth]{./media/5-nearest.pdf}
+            \caption[k=1 and k=5 Nearest Neighbor]{Left: k=1 Nearest Neighbor. Right: k=5 Nearest Neighbor}
+            \label{fig:kNearOneAndFive}
+        \end{figure}
+
+    }
+
+%  ┌────────────────────────┐
+%  │   General Functions    │
+%  └────────────────────────┘
+    % function to create magnitude bars around a function
+    \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+    \DeclareDocumentCommand{\reff}{m} {
+        \edef\link{#1}
+        \hspace{-0.5em}\hyperref[\link]{\Cref*{\link}} \hspace{-0.65em}
+    }
+
+    \DeclareDocumentCommand{\newFigure}{m m m m} {
+        \edef\path{#1} \edef\figcaption{#2} \edef\size{#3}  
+
+        % add size if not present
+        \IfNoValueTF{#3} { % if 2 and 3 are NULL
+            \def\size{0.75}
+            }{}
+
+            % add caption if not present
+        \IfNoValueTF{#2} { % if 2 and 3 are NULL
+            %\expandafter\StrSubstitute\expandafter{\temp}{-}{ }[\output]
+            \newcommand\helphere{\temp}
+            \StrBehind{\helphere}{/}[\figcaption]
+        }{}
+
+        \begin{figure}[H]
+            \begin{center}
+                \includegraphics[width=\size\textwidth]{\path}
+                % I deleted the capitalize function because it wouldn't pass []
+                % \capitalisewords{}
+                \caption{\figcaption}
+                \label{#4} % label gets rid of type and -.
+            \end{center}
+        \end{figure} 
+    }
+
+%  ┌────────────────────────┐
+%  │   Content Functions    │
+%  └────────────────────────┘
+    \newcommand{\pageSetup} {
+
+        \let\Title\@title
+        \let\Date\@date
+        \let\Author\@author
+
+        % \patchcmd{\subsection}{\bfseries}{\normalsize}{}{}
+        % \patchcmd{\subsection}{0.5em}{-0.5em}{}{}
+        % \renewcommand{\thesubsection}{\normalsize\hspace{-1em}}
+
+        % makes subsection appear in-line
+        \renewcommand\subsection{\@startsection{subsubsection}{4}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {-1.5ex \@plus -.2ex}% Formerly 1.5ex \@plus .2ex
+                                     {\normalfont\normalsize\bfseries}}        \renewcommand{\thesubsection}{\hspace{-1em}}
+
+                                     % turns off section numbers
+                                     % \renewcommand{\thesection}{\hspace{-1em}}
+                                     % \renewcommand{\partname}{}
+                                     % \renewcommand{\thepart}{}
+
+        \newgeometry{left=1in,bottom=1in,right=1in,top=1in} % page dims
+        \setlength\parindent{0pt}	% set no tab on new paragraphs
+        \parskip = \baselineskip	% set single skip after paragraphs
+        \setlist{nosep,after=\vspace{\baselineskip}} % remove space on list
+        }\hypersetup{				% hyper-links environment
+            colorlinks,
+            linkcolor	= {black},
+            citecolor	= {black},
+            urlcolor	= {black},
+            pdfborderstyle={/S/U/W 1}
+        }
+
+    \newcommand{\createTitlePage} {
+        \vspace*{2.5cm}
+        \begin{center}
+            \thispagestyle{empty}
+            
+
+            \huge{\Title} 
+
+            % line
+            \vspace{0.25em}
+            \line(1,0){250}\normalsize 
+
+            \vspace{5mm}
+            \class 
+
+            \vspace{1cm}
+                \begin{center}
+                \includegraphics[width=0.85\textwidth]{media/title-page.pdf}\par
+                    Figure: Two Hidden Layer Neural Network 
+                \end{center}
+            \vspace{2.5cm}
+
+            \Author \vspace{-1em}
+
+            Utah State University \vspace{-1em}
+
+            \Date           \vspace{-1em}
+
+            \pagenumbering{gobble} 
+            \newpage
+        \end{center}
+    }
+
+    \newcommand{\createTableOfContents} {
+        \pagenumbering{roman}
+        \clearpage
+        % \newdimen\punktik
+        % \def\cvak{\ifdim\punktik<6pt \global\punktik=3pt \else\global\punktik=3pt \fi}
+        % \def\tocdots{\cvak\leaders\hbox to10pt{\kern\punktik.\hss}\hfill}
+        % \titlecontents{section}[0em]{\vskip -1em}{}{\itshape}{\hfill\thecontentspage}
+        % \titlecontents{subsection}[1em]{\vskip -1em}{}{} {\tocdots\thecontentspage}
+
+        
+        \tableofcontents 
+
+        \clearpage
+        \renewcommand*\listfigurename{\normalsize{List of Figures}}
+        \listoffigures
+
+        \renewcommand*\listtablename{\normalsize{List of Tables}}
+        \listoftables
+
+        \newpage
+        \pagenumbering{arabic}
+    }
+
+    \newcommand{\includeHeader} {
+        \pagestyle{fancy}
+        \fancyhf{}
+        % \fancyhead[L]{Top Left}
+        \fancyhead[L]{\Title}
+        \fancyhead[R]{\nouppercase\leftmark}
+        % \fancyhead[R]{Top Right}
+        \renewcommand{\headrulewidth}{0.5pt}
+        %\fancyfoot[L]{Bottom Left}
+        \fancyfoot[C]{\thepage}
+        %\fancyfoot[R]{Bottom Right}
+        \renewcommand{\footrulewidth}{0.5pt}
+    }
+
+%  ┌────────────────────────┐
+%  │    Written Content     │
+%  └────────────────────────┘
+    \DeclareDocumentCommand{\summary}{} {
+        \section{Summary}\label{sec:summary}
+        Neural Networks have applications in image recognition, data compression, and even stock market prediction. The basic concept behind Neural Networks is simply depicted as seen on the main figure of title page. This paper presents the basic structure for machine learning on classified data using a randomly generated data-set (2-classes), and the MNIST data-set (10 classes).
+
+        The MNIST data-set consists of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau. Each image is 28 × 28 so that when it is vectorized it has dimension 784. The MNIST data-set is ideal for machine learning because of the variable nature of handwriting and the limited classes of numbers.
+
+        \newFigure{./media}{}{.6}{fig:}
+        % TODO:Plot a least one instance of each digit 0 – 9. Include the plots in your homework. (It will save paper to use subplots instead of a separate figure for each digit.)
+    } 
+
+    \DeclareDocumentCommand{\program}{} {
+        \section{Program Description}\label{sec:program}
+        % TODO:  The hidden layer should use ReLU functions, and the output layer should be adjustable so that it can use different functions. In particular, you will need to be able to use the sigmoid function and the softmax function as output layer functions.
+
+        % You should write your functions so that the number of inputs is a parameter, the number of neurons in the hidden layer is a parameter, and the number of outputs is a parameter.  Your function should perform training by back propagation. 
+        % TODO: You should also make it possible to incorporate momentum in your learning. You should also make it possible to do batch learning.  In light of the second part of this assignment, you may want to also write your code so that the number of layers is also a parameter, with settable parameters for each layer.
+    }
+
+    \DeclareDocumentCommand{\twoclass}{} {
+        \section{Two-class Classifier}\label{sec:two-class}
+        % Using the data from the “Data-driven Classifiers” problem (the data from the file classasgntrain1.dat), divide the data into 80% training and 20% testing. This neural network has 2 input neurons (for the two-dimensional inputs). Create a neural network having a single hidden layer with 5 neurons. Since this is a two-class problem, use the sigmoid function as the output-layer function, with a single output.  Train your network using the training data. (Since the data set is so small, it does not make sense to do batch learning.) Try different values of the learning parameter (step size) until you are satisfied that it is doing the learning correctly. Test your network using the test data. Report on the probability of error. Discuss performance relative to classifiers you have implemented in the first assignment.  After you have your network successfully learning, introduce momentum learning with β = 0.8. Train and test the network. Comment on the difference that the momentum makes, if any.
+    }
+    
+    \DeclareDocumentCommand{\tenclass}{} {
+        \section{Ten-class Classifier}\label{sec:ten-class}
+        % Now train your neural network using the training data from the MNIST database, using 300 neurons in the hidden layer. Obviously, for the 10 digits, you’ll need to have ten neurons in the output layer, and you should use the softmax function in the output layer.  Use a batch of size 100. Use at least three different values of the step size paremeter. For each of these values of step size parameter, make a plot of the MSE as a function of iteration every 50 iterations. (You may need to experiment to determine how many iterations you need.)
+
+        % TODO: Test your neural network using the test data from the MNIST database. Report the probability of successful classification.
+
+        % Comment on how many iterations are needed, and how long (in clock time) it takes to train.  + Create a network with two hidden layers, where the first hidden layer has 5 neurons and the second hidden layer has 10 neurons. (If you didn’t write your code in the first place to accomodate different numbers of layers, after completing this part you may want to re-factor your code so that it can now handle different numbers of layers.) Using the data in classasgntrain1.dat as before, train and test the network and report on the probability of error. Comment on the difference in performance between the one-layer and the two-layer networks.  + Create a network with two hidden layers, with 300 neurons in the first (lowest) hidden layer and 100 neurons in the second hidden layer. Again, try different values of the step size parameter, plotting the MSE as a function of iteration. Use a minibatch of size 100. And again, test using the test data from the MNIST database.  + Train your network using momentum learning with β = 0.8, and repeat the above experiments.  + Turn in answers to questions, program listings, plots, comments, and observations.
+         
+        % Comment on how many iterations are needed, and how long (in clock time) it takes to train.
+        % + Create a network with two hidden layers, where the first hidden layer has 5 neurons and the second hidden layer % has 10 neurons. (If you didn’t write your code in the first place to accomodate different numbers of layers, after % completing this part you may want to re-factor your code so that it can now handle different numbers of layers.) % Using the data in classasgntrain1.dat as before, train and test the network and report on the probability % of error. Comment on the difference in performance between the one-layer and the two-layer networks.
+        % + Create a network with two hidden layers, with 300 neurons in the first (lowest) hidden layer and 100 neurons in % the second hidden layer. Again, try different values of the step size parameter, plotting the MSE as a function of % iteration. Use a minibatch of size 100. And again, test using the test data from the MNIST database.
+        % + Train your network using momentum learning with β = 0.8, and repeat the above experiments.
+        % + Turn in answers to questions, program listings, plots, comments, and observations.
+    }
+
+\begin{document}
+    \main
+    test: π β
+\end{document}
