@@ -10,31 +10,28 @@ import time
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
-    num_inputs = 2
-    num_outputs= 2
+    num_inputs = 784
+    num_outputs= 10 
     batch_size = 100
-    epics = 10 
+    epics = 300
 
     # X,Y = pickle.load(open("./in_out.p","rb"))
     # X,Y = get_moon_class_data() 
-    X,Y = get_mnist_train
-    X = mnist.train.images
-    y = mnist.train.labels.astype("int")
-    
+    X,Y = get_mnist_train("./data")
+    X = X[0:10]
+    Y = Y[0:10]
 
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 23
+    num_neurons = 300 
     # input layer
-    layers = [layer(num_inputs,20,sig)]
-    layers.append(layer(20,num_neurons,sig))
+    layers = [layer(num_inputs,num_neurons,sig)]
     layers.append(layer(num_neurons,num_outputs,no_activation))
 
     # create neural network
     network = NeuralNetwork(layers) 
-    network.set_initial_conditions()
 
     # train network
     network.train_network(X,Y,batch_size,epics)
@@ -49,6 +46,12 @@ def main():
 
     # plot error
     network.plot_error()    
+def get_mnist_train(file_path):
+    mnist = input_data.read_data_sets(file_path)
+    X = mnist.train.images
+    y = mnist.train.labels.astype("int")
+    Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
+    return X,Y 
 
 def get_2_class_data():
     X = np.array([[0.05, 0.1],
@@ -160,6 +163,7 @@ class NeuralNetwork:
                 print("Epic %d MSE: %f"%(i+1, np.mean(self.error_array[-MSE_freq:])))
          
         # create error plot
+        print("Final MSE: %f"%(np.mean(self.error_array[-MSE_freq:])))
         plot = self.error_array[::-1]
         for i in range(0,len(plot),MSE_freq):
             self.error_plot.append(np.mean(plot[i:i+MSE_freq]))
