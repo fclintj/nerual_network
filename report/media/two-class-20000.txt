@@ -1,0 +1,15 @@
+-------- Running --------
+Training Data...
+Epic 1 MSE: 0.668210
+Epic 81 MSE: 0.339729
+Epic 161 MSE: 0.277568
+Epic 241 MSE: 0.251570
+Epic 321 MSE: 0.237392
+Epic 401 MSE: 0.228466
+Epic 481 MSE: 0.222349
+Epic 561 MSE: 0.217920
+Epic 641 MSE: 0.214591
+Epic 721 MSE: 0.212018
+Final MSE: 0.210010
+3888 Mistakes. Training Accuracy: 80.56%
+

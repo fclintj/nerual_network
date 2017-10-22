@@ -5,51 +5,34 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 NeuralNetwork	deepnn.py	/^class NeuralNetwork:$/;"	c
-X	tensor_flow.py	/^X = tf.placeholder("float", [None, num_input])$/;"	v
-Y	tensor_flow.py	/^Y = tf.placeholder("float", [None, num_classes])$/;"	v
-__init__	deepnn.py	/^                 eta=0.1, scale=0.01  ):$/;"	m	class:NeuralNetwork
 __init__	deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
+__init__	deepnn.py	/^    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=10):$/;"	m	class:NeuralNetwork
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __set_GRV_starting_weights	deepnn.py	/^    def __set_GRV_starting_weights(self):$/;"	m	class:NeuralNetwork	file:
-accuracy	tensor_flow.py	/^accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))$/;"	v
 activation_function	deepnn.py	/^class activation_function:$/;"	c
-batch_size	tensor_flow.py	/^batch_size = 1$/;"	v
-biases	tensor_flow.py	/^biases = {$/;"	v
 classify_data	deepnn.py	/^    def classify_data(self, X):$/;"	m	class:NeuralNetwork
-correct_pred	tensor_flow.py	/^correct_pred = tf.equal(tf.argmax(prediction, 1), tf.argmax(Y, 1))$/;"	v
 data_frame	deepnn.py	/^class data_frame:$/;"	c
 der	deepnn.py	/^    def der(self, X):$/;"	m	class:layer
 derivative	deepnn.py	/^    def derivative(self,x):$/;"	m	class:activation_function
-display_step	tensor_flow.py	/^display_step = 1$/;"	v
 forward	deepnn.py	/^    def forward(self, X):$/;"	m	class:layer
 forward_prop	deepnn.py	/^    def forward_prop(self, X):$/;"	m	class:NeuralNetwork
 function	deepnn.py	/^    def function(self,x):$/;"	m	class:activation_function
 gendata2	deepnn.py	/^def gendata2(class_type,N):$/;"	f
 get_2_class_data	deepnn.py	/^def get_2_class_data():$/;"	f
 get_3_class_data	deepnn.py	/^def get_3_class_data():$/;"	f
+get_classasgn_80_20	deepnn.py	/^def get_classasgn_80_20():$/;"	f
+get_mnist_train	deepnn.py	/^def get_mnist_train(file_path):$/;"	f
 get_moon_class_data	deepnn.py	/^def get_moon_class_data():$/;"	f
-get_ordered	deepnn.py	/^def get_ordered(X_train):$/;"	f
+get_moon_gendata	deepnn.py	/^def get_moon_gendata():$/;"	f
+get_ordered_digits	deepnn.py	/^def get_ordered_digits(X_train):$/;"	f
 get_sprial_class_data	deepnn.py	/^def get_sprial_class_data():$/;"	f
-init	tensor_flow.py	/^init = tf.global_variables_initializer()$/;"	v
 layer	deepnn.py	/^class layer:$/;"	c
-learning_rate	tensor_flow.py	/^learning_rate = 0.0$/;"	v
-logits	tensor_flow.py	/^logits = neural_net(X)$/;"	v
-loss_op	tensor_flow.py	/^loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits($/;"	v
 main	deepnn.py	/^def main():$/;"	f
-mnist	tensor_flow.py	/^mnist = input_data.read_data_sets("\/tmp\/data\/", one_hot=True)$/;"	v
-n_hidden_1	tensor_flow.py	/^n_hidden_1 = 2 # 1st layer number of neurons$/;"	v
-n_hidden_2	tensor_flow.py	/^n_hidden_2 = 2 # 2nd layer number of neurons$/;"	v
-neural_net	tensor_flow.py	/^def neural_net(x):$/;"	f
-num_classes	tensor_flow.py	/^num_classes = 2 # MNIST total classes (0-9 digits)$/;"	v
-num_input	tensor_flow.py	/^num_input = 2 # MNIST data input (img shape: 28*28)$/;"	v
-num_steps	tensor_flow.py	/^num_steps = 1$/;"	v
-optimizer	tensor_flow.py	/^optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)$/;"	v
-plot_boundaries	deepnn.py	/^def plot_boundaries(data,equation):$/;"	f
-plot_data	deepnn.py	/^def plot_data(data):$/;"	f
+plot_boundaries	deepnn.py	/^def plot_boundaries(xlim, ylim, equation):$/;"	f
+plot_data	deepnn.py	/^def plot_data(x0,x1):$/;"	f
 plot_error	deepnn.py	/^    def plot_error(self):$/;"	m	class:NeuralNetwork
-prediction	tensor_flow.py	/^prediction = tf.nn.softmax(logits)$/;"	v
-print_images	deepnn.py	/^def print_images(ordered,m,n):$/;"	f
+print_digits	deepnn.py	/^def print_digits(X,ordered,m,n):$/;"	f
 relu_der	deepnn.py	/^def relu_der(X):$/;"	f
 relu_func	deepnn.py	/^def relu_func(X):$/;"	f
 return_value	deepnn.py	/^def return_value(X):$/;"	f
@@ -61,9 +44,7 @@ softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
 stable_softmax	deepnn.py	/^    def stable_softmax(self, X):$/;"	m	class:NeuralNetwork
 stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
-train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epics, MSE_freq=30):$/;"	m	class:NeuralNetwork
-train_op	tensor_flow.py	/^train_op = optimizer.minimize(loss_op)$/;"	v
+train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epics):$/;"	m	class:NeuralNetwork
 um_neurons	classasgntrain1.p	/^sbsS'num_neurons'$/;"	f
 validate_results	deepnn.py	/^    def validate_results(self, Yhat, Y):$/;"	m	class:NeuralNetwork
-weights	tensor_flow.py	/^weights = {$/;"	v
 write_network_values	deepnn.py	/^    def write_network_values(self, filename):$/;"	m	class:NeuralNetwork

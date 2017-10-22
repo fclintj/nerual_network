@@ -4,31 +4,29 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 import pickle
-import time
 from   tensorflow.examples.tutorials.mnist import input_data
 
 def main():
-    num_inputs = 784
-    num_outputs= 10 
-    batch_size = 100
-    epics = 300
+    num_inputs = 2
+    num_outputs= 2 
+    batch_size = 200
+    epics = 800
 
     # X,Y = pickle.load(open("./in_out.p","rb"))
-    # X,Y = get_moon_class_data() 
-    X,Y = get_mnist_train("./data")
-    X = X[0:10]
-    Y = Y[0:10]
-
+    # X,Y,X_test,Y_test = get_classasgn_80_20() 
+    X,Y = get_moon_class_data() 
+    X_test,Y_test = get_moon_gendata() 
+    # X,Y = get_mnist_train("./data")
+    
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
-    
-    num_neurons = 300 
+
+    num_neurons = 5 
     # input layer
-    layers = [layer(num_inputs,num_neurons,relu)]
-    layers.append(layer(num_neurons,num_outputs,no_activation))
+    layers = [layer(num_inputs,num_neurons,sig)]
+    layers.append(layer(num_neurons,num_outputs,sig))
 
     # create neural network
     network = NeuralNetwork(layers) 
@@ -37,15 +35,20 @@ def main():
     network.train_network(X,Y,batch_size,epics)
 
     # classify data
-    Yhat = network.classify_data(X)
-    # print(Yhat)
-    # print(Y)
-    network.validate_results(Yhat,Y) 
-    # print(Yhat)
-    # network.write_network_values("network_first.p")
-
+    Yhat = network.classify_data(X_test)
+    network.validate_results(Yhat,Y_test) 
+    
+    plot_data(X[0:100],X[100:200])
+    xtot = np.r_[X,X_test] 
+    xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
+    ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
+    plot_boundaries(xlim,ylim,network.classify_data)
+    plt.show()
+    
     # plot error
     network.plot_error()    
+    plt.show()
+
 def get_mnist_train(file_path):
     mnist = input_data.read_data_sets(file_path)
     X = mnist.train.images
@@ -99,27 +102,18 @@ def get_sprial_class_data():
     Y = (np.arange(np.max(y) + 1) == y[:, None]).astype(float)
     return X,Y
 
-def get_moon_class_data():
-    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
-    x0 = data[:,0:2]
-    x1 = data[:,2:4]
-    data = data_frame(x0,x1)
-    return data.xtot,data.class_tot
-
 class NeuralNetwork:
-    def __init__(self,    layers,   softmax=True,  momentum=0.9, \
-                 eta=0.1, scale=0.01  ):
-
+    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=10):
         self.softmax=softmax
         self.num_layers = len(layers)
         self.num_outputs = layers[self.num_layers-1].num_neurons
         self.layers = layers
         self.momentum = momentum
-        self.scale = scale
         self.eta = eta 
         self.softmax = softmax 
         self.error_plot = [] 
         self.error_array = [] 
+        self.MSE_freq = MSE_freq
         self.__set_GRV_starting_weights()
 
     def __set_GRV_starting_weights(self):
@@ -147,7 +141,7 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epics, MSE_freq=10):
+    def train_network(self, X, Y, batch_size, epics):
         print("Training Data...")
 
         if epics > 5000:
@@ -158,15 +152,16 @@ class NeuralNetwork:
         
         for i in range(epics):
             batch = np.random.randint(0,X.shape[0],batch_size)
-            self.train_data(X[batch],Y[batch]) 
+            # self.train_data(X[batch],Y[batch]) 
+            self.train_data(X,Y) 
             if i%print_frequency is 0:
-                print("Epic %d MSE: %f"%(i+1, np.mean(self.error_array[-MSE_freq:])))
+                print("Epic %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
          
         # create error plot
-        print("Final MSE: %f"%(np.mean(self.error_array[-MSE_freq:])))
+        print("Final MSE: %f"%(np.mean(self.error_array[-self.MSE_freq:])))
         plot = self.error_array[::-1]
-        for i in range(0,len(plot),MSE_freq):
-            self.error_plot.append(np.mean(plot[i:i+MSE_freq]))
+        for i in range(0,len(plot),self.MSE_freq):
+            self.error_plot.append(np.mean(plot[i:i+self.MSE_freq]))
         self.error_plot = self.error_plot[::-1]
 
     def train_data(self, X, Y):
@@ -203,6 +198,9 @@ class NeuralNetwork:
 
     def plot_error(self):
         plt.plot(range(len(self.error_plot)), self.error_plot)
+        plt.title("Mean Squared Error")
+        plt.xlabel("Average MSE per %d training"%(self.MSE_freq))
+        plt.ylabel("Percent")
         plt.show()
 
     def write_network_values(self, filename):
@@ -260,6 +258,26 @@ class activation_function:
     def derivative(self,x):
         return self.derivative(x) 
 
+def get_moon_class_data():
+    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    x0 = data[:,0:2]
+    x1 = data[:,2:4]
+    data = data_frame(x0,x1)
+    return data.xtot,data.class_tot
+
+def get_moon_gendata():
+    x0 = gendata2(0,10000)
+    x1 = gendata2(1,10000)
+    data = data_frame(x0,x1)
+    return data.xtot, data.class_tot 
+
+def get_classasgn_80_20():
+    data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)
+    x0 = data[:,0:2]
+    x1 = data[:,2:4]
+    data = data_frame(x0,x1)
+    return data.train_tot,data.train_class_tot,data.test_data,data.test_class_tot
+
 class data_frame:
     def __init__(self, data0, data1):
         self.x0 = data0 
@@ -274,30 +292,47 @@ class data_frame:
         class_x1 = np.c_[np.ones([self.N1,1]),np.zeros([self.N1,1])] 
         self.class_tot = np.r_[class_x0,class_x1]
         self.y = np.r_[np.ones([self.N0,1]),np.zeros([self.N1,1])] 
+        
+        # create a training set from the classasgntrain1.dat
+        self.train_x0 = data0[0:80]
+        self.train_x1 = data1[0:80]
+        self.train_tot = np.r_[data0[0:80],data1[0:80]]
+        self.train_class_tot = np.r_[self.class_tot[0:80],self.class_tot[100:180]]
+        self.test_data = np.r_[data0[80:100],data1[80:100]]
+        self.test_class_tot = np.r_[self.class_tot[80:100],self.class_tot[180:200]]
 
-def get_ordered(X_train):
-    ordered = [ 
-            X_train[7] , # 0 
-            X_train[4] , # 1 
-            X_train[16], # 2
-            X_train[1] , # 3 
-            X_train[2] , # 4
-            X_train[27], # 5
-            X_train[3] , # 6
-            X_train[14], # 7 
-            X_train[5] , # 8 
-            X_train[8] , # 9
-            ]       
-    return ordered
+def plot_data(x0,x1):
+    xtot = np.r_[x0,x1]
+    xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
+    ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
 
-def print_images(ordered,m,n):
-    f, ax = plt.subplots(m,n)
-    ordered = get_ordered(X_train);
-    for i in range(m):
-        for j in range(n):
-            ordered[i*n+j] = ordered[i*n+j].reshape(28,28)
-            ax[i][j].imshow(ordered[i*n+j], cmap = plt.cm.binary, interpolation="nearest")
-            ax[i][j].axis("off")
+    fig = plt.figure() # make handle to save plot 
+    plt.scatter(x0[:,0],x0[:,1],c='red',label='$x_0$')
+    plt.scatter(x1[:,0],x1[:,1],c='blue',label='$x_1$')
+    plt.xlabel('X Coordinate') 
+    plt.ylabel('Y Coordinate') 
+    plt.title("Neural Network 2 Class Boundary")
+    plt.legend()
+
+def plot_boundaries(xlim, ylim, equation):
+    xp1 = np.linspace(xlim[0],xlim[1], num=100)
+    yp1 = np.linspace(ylim[0],ylim[1], num=100) 
+    
+    red_pts = np.array([[],[]])
+    blue_pts= np.array([[],[]])
+    for x in xp1:
+        for y in yp1:
+            point = np.array([x,y]).reshape(1,2)
+            prob = equation(point)
+            if prob == 0:
+                blue_pts = np.c_[blue_pts,[x,y]]
+            else:
+                red_pts = np.c_[red_pts,[x,y]]
+
+    plt.scatter(blue_pts[0,:],blue_pts[1,:],color='blue',s=0.25)
+    plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
+    plt.xlim(xlim)
+    plt.ylim(ylim)
     plt.show()
 
 def sigmoid_func(x):
@@ -325,36 +360,6 @@ def softmax_func(x):
     exps = np.exp(x)
     return exps / np.sum(exps)
 
-def plot_data(data):
-    fig = plt.figure() # make handle to save plot 
-    plt.scatter(data.x0[:,0],data.x0[:,1],c='red',label='$x_0$')
-    plt.scatter(data.x1[:,0],data.x1[:,1],c='blue',label='$x_1$')
-    plt.xlabel('X Coordinate') 
-    plt.ylabel('Y Coordinate') 
-    plt.legend()
-
-def plot_boundaries(data,equation):
-    xp1 = np.linspace(data.xlim[0],data.xlim[1], num=100)
-    yp1 = np.linspace(data.ylim[0],data.ylim[1], num=100) 
-    
-    red_pts = np.array([[],[]])
-    blue_pts= np.array([[],[]])
-    for x in xp1:
-        for y in yp1:
-            point = np.array([x,y]).reshape(1,2)
-            prob = equation(point)
-            if prob == 0:
-                blue_pts = np.c_[blue_pts,[x,y]]
-            else:
-                red_pts = np.c_[red_pts,[x,y]]
-
-    plot_data(data)
-    plt.scatter(blue_pts[0,:],blue_pts[1,:],color='blue',s=0.25)
-    plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
-    plt.xlim(data.xlim)
-    plt.ylim(data.ylim)
-    plt.show()
-
 def gendata2(class_type,N):
     m0 = np.array(
          [[-0.132,0.320,1.672,2.230,1.217,-0.819,3.629,0.8210,1.808, 0.1700],
@@ -377,7 +382,7 @@ def gendata2(class_type,N):
         x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
     return x.T
 
-def get_ordered(X_train):
+def get_ordered_digits(X_train):
     ordered = [ 
             X_train[7] , # 0 
             X_train[4] , # 1 
@@ -392,9 +397,9 @@ def get_ordered(X_train):
             ]       
     return ordered
 
-def print_images(ordered,m,n):
+def print_digits(X,ordered,m,n):
     f, ax = plt.subplots(m,n)
-    ordered = get_ordered(X_train);
+    ordered = get_ordered(X);
     for i in range(m):
         for j in range(n):
             ordered[i*n+j] = ordered[i*n+j].reshape(28,28)

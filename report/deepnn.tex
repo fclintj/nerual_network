@@ -16,6 +16,7 @@
    \program
    \twoclass
    \tenclass
+   \appendix
 }
 
 %  ┌────────────────────────┐
@@ -24,7 +25,7 @@
     % \usepackage{fontspec}   % allows Unicode in XeLaTex
     % \setmainfont{FreeSerif} % introduction to fonts below 
     % https://tex.stackexchange.com/questions/320096/xelatex-fontspec-cannot-find-fonts 
-    \usepackage{ucharclasses} % allows Unicode in XeLaTex
+    % \usepackage{ucharclasses} % allows Unicode in XeLaTex
     \usepackage[utf8]{inputenc}	% allows new character options
     \usepackage[a4paper]{geometry}   % Paper dimensions and margins
     \usepackage{fancyhdr}   % include document header
@@ -46,6 +47,8 @@
     \usepackage{etoolbox}
     \usepackage{tabulary}	% columns size of their contents (on page)
     \usepackage{booktabs}   % allows for \toprule in tables
+    \usepackage{subcaption} % add two plots together
+    \usepackage[nomessages]{fp} % calculations in latex
 
     \definecolor{mygreen}{RGB}{28,172,0}	% custom defined colors
     \definecolor{mylilas}{RGB}{170,55,241}
@@ -96,6 +99,25 @@
 %  └────────────────────────┘
     % function to create magnitude bars around a function
     \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+    \DeclareDocumentCommand{\newFigureTwo}{m m m m m m m m} {
+        % \FPeval{opposite}{1-#9}
+        \begin{figure}[H]
+        \centering
+        \begin{subfigure}{.5\textwidth}
+          \centering
+          \includegraphics[width=#3\linewidth]{#1}
+          \caption{#2}
+        \end{subfigure}%
+        \begin{subfigure}{.5\textwidth}
+          \centering
+          \includegraphics[width=#6\linewidth]{#4}
+          \caption{#5}
+        \end{subfigure}
+        \caption{#7}
+        \label{#8}
+        \end{figure}
+    }
 
     \DeclareDocumentCommand{\reff}{m} {
         \edef\link{#1}
@@ -243,25 +265,88 @@
 
         The MNIST data-set consists of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau. Each image is 28 × 28 so that when it is vectorized it has dimension 784. The MNIST data-set is ideal for machine learning because of the variable nature of handwriting and the limited classes of numbers.
 
-        \newFigure{./media}{}{.6}{fig:}
-        % TODO:Plot a least one instance of each digit 0 – 9. Include the plots in your homework. (It will save paper to use subplots instead of a separate figure for each digit.)
+        Ten numbers from the data-set can been seen in \reff{fig:mnist}.
+
+        \newFigure{./media/mnist.png}{10 Digits from the MNIST Data-set}{.6}{fig:mnist}
+        The remainder of the paper will be dedicated to analyzing the effectiveness of Neural Networks in identifying correctly different classes of data such as the numbers seen in \reff{fig:mnist}.
     } 
 
     \DeclareDocumentCommand{\program}{} {
         \section{Program Description}\label{sec:program}
-        % TODO:  The hidden layer should use ReLU functions, and the output layer should be adjustable so that it can use different functions. In particular, you will need to be able to use the sigmoid function and the softmax function as output layer functions.
+        
+        The generic neural network that I wrote can have any number of layers, neurons, and activation function passed to it for an \texttt{n} demensional input with \texttt{k} number of classes. The Network is initialized by specifying  \texttt{num\_inputs}, \texttt{num\_outputs}, \texttt{batch\_size}, and \texttt{epics}.
+        
+        In testing the different classes in this paper, the ReLU (Rectified Linear Unit) was used for the majority of the classification problems. 
 
-        % You should write your functions so that the number of inputs is a parameter, the number of neurons in the hidden layer is a parameter, and the number of outputs is a parameter.  Your function should perform training by back propagation. 
-        % TODO: You should also make it possible to incorporate momentum in your learning. You should also make it possible to do batch learning.  In light of the second part of this assignment, you may want to also write your code so that the number of layers is also a parameter, with settable parameters for each layer.
+        The desired data is read in, and any activation functions are defined for the different layers. As seen in the heading \texttt{\# input layer}, the layers are created by passing the number of inputs that they will receive, the number of desired neurons, and the type of activation function. The final layer seen in the code snippet below does not have an activation function because by default softmax is run on the output of the network. In this way, the output option can easily be changed between the softmax and sigmoid functions.
+        
+        Additional parameters exist for the initialization of the network, but they are optional parameters. Such variables include the momentum $\beta$ and step size $\eta$, as seen in the initialization of the Neural Network.
+
+        \lstinputlisting[language=Python,firstline=12,lastline=39,]{../python/deepnn.py}
+
+        For a full description of the different classes, such as the class \texttt{layer} and \texttt{activation\_function}, see \reff{app:code-listing}. 
+
+        The Training of the system is done by back propagation, which will be discusses in later detail later on.
     }
 
     \DeclareDocumentCommand{\twoclass}{} {
         \section{Two-class Classifier}\label{sec:two-class}
-        % Using the data from the “Data-driven Classifiers” problem (the data from the file classasgntrain1.dat), divide the data into 80% training and 20% testing. This neural network has 2 input neurons (for the two-dimensional inputs). Create a neural network having a single hidden layer with 5 neurons. Since this is a two-class problem, use the sigmoid function as the output-layer function, with a single output.  Train your network using the training data. (Since the data set is so small, it does not make sense to do batch learning.) Try different values of the learning parameter (step size) until you are satisfied that it is doing the learning correctly. Test your network using the test data. Report on the probability of error. Discuss performance relative to classifiers you have implemented in the first assignment.  After you have your network successfully learning, introduce momentum learning with β = 0.8. Train and test the network. Comment on the difference that the momentum makes, if any.
+        The data set from \texttt{classasgntrain1.dat} is a grouping of data centered around 10 different points with a Gaussian Distribution for each class. I split the data into 80\% training data and 20\% testing data using the function seen in the listing below:
+
+        \lstinputlisting[language=Python,firstline=274,lastline=302,]{../python/deepnn.py}
+
+        The network trained the data using sigmoid functions, and it produced the output seen in \reff{fig:two-class-bound}:
+        
+        \newFigureTwo
+        {./media/two-class-bound.pdf}{80\% Training Data, 20\% Testing Data}{.9}
+        {./media/two-class-bound-mse.pdf}{Mean Squared Error for 80\%, 20\% Data}{.9}
+        {Trained Output for 80 Training Data, 20 Testing Data with 0.8 Momentum}{fig:two-class-bound}
+        
+        The resulting listing from the program showed that it correctly classified the small batch of test data with only 3 mistakes with a 92.5\% accuracy. 
+
+        \lstinputlisting[language={}]{./media/two-class-boud-output.txt}
+
+        In previous processing, I found that the classification methods in \reff{tab:compare} performed with the following errors in percent. Note that the Bayes Optimal Classifier performed the best because it knew the true distribution of the data. 
+
+        \begin{table}[H]
+            \begin{tabulary}{\linewidth}{rccc}	
+                && \multicolumn{2}{c}                   {Errors in \%}      \\
+                \toprule % --------------------------------------------------
+                        Method	            & Run-time &    Training  &  Test     \\ 
+                \toprule % ---------------------------------------------------
+                Linear Regression 		        &  1.23s   &      14.5    &  20.49    \\
+                Quadratic Regression	        &  1.70s   &      14.5    &  20.44    \\
+                Linear Discriminant Analysis    &  2.49s   &      15.0    &  19.98    \\
+                Quadratic Discriminant Analysis	&  3.26s   &      14.5    &  20.23    \\
+                Logistic Regression     	    &  2.00s   &      14.0    &  20.00    \\
+                1-Nearest Neighbor	    	    &  35.02s  &      00.0    &  21.83    \\
+                5-Nearest Neighbor	    	    &  37.92s  &      12.0    &  20.29    \\
+                15-Nearest Neighbor             &  36.47s  &      16.0    &  19.25    \\
+                Bayes Naive 	                &  1.22s   &      14.0    &  20.04    \\
+                Bayes Optimal Classifier        &  0.20s   &      14.0    &  19.14    \\
+                \bottomrule % ------------------------------------------------
+            \end{tabulary}\caption{Binary Classifier Performance Comparison}\label{tab:compare}  \end{table} 
+
+        To compare the Neural Network with the other classifiers, I trained on all data points from the \texttt{classasgntrain1.dat} data set and ran it on 20000 randomly generated data points. The results can be seen in \reff{fig:two-class-bound-20000}
+
+        \newFigureTwo
+        {./media/two-class-20000.pdf}{Training on All 200 data points}{.9}
+        {./media/two-class-20000-mse.pdf}{MSE for the Training Routine}{.9}
+        {Trained Output for 200 Data Points in \texttt{classasgntrain1.dat} with 0.8 Momentum and Step Size of 0.1}{fig:two-class-bound-20000}
+        
+        \lstinputlisting[language={}]{./media/two-class-20000.txt}
+
+        The Neural Network returned an error of 19.44\%, which puts its results just behind the Bayes Optimal Classifier and the k-nearest neighbor approach. It is also important to note that the momentum term has a significant effect on the speed at which the Mean Squared Error drops. \reff{fig:two-class-comp-momentum} shows the dramatic speed difference that the momentum has on the convergence of the Mean Squared Error. Increasing the momentum to 0.8 did not have a significant effect on the percent of errors. 
+
+        \newFigureTwo
+        {./media/two-class-20000-mse-no-momentum.pdf}{MSE with No Momentum}{.9}
+        {./media/two-class-20000-mse.pdf}{MSE with 0.8 Momentum}{.9}
+        {Comparison of Two-class Classifier with and without Momentum}{fig:two-class-comp-momentum}
     }
     
     \DeclareDocumentCommand{\tenclass}{} {
         \section{Ten-class Classifier}\label{sec:ten-class}
+        
         % Now train your neural network using the training data from the MNIST database, using 300 neurons in the hidden layer. Obviously, for the 10 digits, you’ll need to have ten neurons in the output layer, and you should use the softmax function in the output layer.  Use a batch of size 100. Use at least three different values of the step size paremeter. For each of these values of step size parameter, make a plot of the MSE as a function of iteration every 50 iterations. (You may need to experiment to determine how many iterations you need.)
 
         % TODO: Test your neural network using the test data from the MNIST database. Report the probability of successful classification.
@@ -275,7 +360,12 @@
         % + Turn in answers to questions, program listings, plots, comments, and observations.
     }
 
+    \DeclareDocumentCommand{\appendix}{} {
+        \section{Appendix}\label{app:code-listing:ten-class}
+        \lstinputlisting[language=Python]{../python/deepnn.py}
+    }
+
+
 \begin{document}
     \main
-    test: π β
 \end{document}
