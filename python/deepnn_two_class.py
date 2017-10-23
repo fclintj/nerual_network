@@ -54,7 +54,7 @@ def main():
         network.plot_error(index,i,j)    
 
         plt.savefig('../report/media/mnist/two_class_-' + str(index) + 
-                    '-mo-' + str(i) + '-eta-' + str(j) + 
+                    '-mo-' + str(int(i*10)) + '-eta-' + str(int(j*10)) + 
                     '.pdf',bbox_inches='tight')
     
 class NeuralNetwork:
@@ -146,8 +146,8 @@ class NeuralNetwork:
                     self.eta * dE_dWeight
             layer.W += - layer.momentum_matrix
 
-        # self.error_array.append(-np.mean(np.sum(np.log(Yhat)*Y)))
-        self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
+        for indx,yhat in enumerate(Yhat):
+            self.error_array.append((yhat-Y[indx])*(yhat-Y[indx]))
 
     def stable_softmax(self, X):
         exp_norm = np.exp(X - np.max(X))

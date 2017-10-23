@@ -11,8 +11,8 @@ import time
 def main():
     num_inputs = 784 
     num_outputs= 10 
-    batch_size = 2000
-    epochs = 1800
+    batch_size = 100
+    epochs = 1300 
 
     # open mnist data
     X,Y,X_test,Y_test = get_mnist_train("./data")
@@ -25,33 +25,48 @@ def main():
 
     # first layer tests
     layers0 = [layer(num_inputs,num_neurons,relu)]
-    layers0.append(layer(num_neurons,num_outputs,relu))
+    layers0.append(layer(num_neurons,num_outputs,no_activation))
 
-    file = open('../report/media/mnist/network_statistics_adjusted.txt',"w") 
-    index = 0
-    i = 0.8
-    for j in np.arange(0.7,0.95,0.1):
-        print("Currently on layer " + str(index) + " momentum " + str(i) + " step size " + str(j))
-        # create neural network
-        network = NeuralNetwork(layers0,eta=j,momentum=i) 
+    # second layer tests 
+    layers1 = [layer(num_inputs,300,relu)]
+    layers1.append(layer(300,100,relu))
+    layers1.append(layer(100,num_outputs,no_activation))
 
-        start_time = time.time()
-        # train network
-        network.train_network(X,Y,batch_size,epochs)
-        end_time = time.time()
-        # classify data
-        Yhat = network.classify_data(X_test)
-        training_accuracy = network.validate_results(Yhat,Y_test) 
-        file.write('mo-' + str(i) + '-eta-' + str(j) + "\n")
-        file.write("Percent Correct: " + str(training_accuracy) + "%\n")
-        file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
+    layer_testbench = [layers0,layers1] 
+    message = ["Layer with 1 hidden network (300 neurons).\n",
+                "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
-        # plot error
-        network.plot_error(index,i,j)    
+    momentum_values = [0.8]
+    step_size = [0.4,0.7,0.9]
 
-        plt.savefig('../report/media/mnist/lay-' + str(index) + 
-                    '-mo-' + str(i) + '-eta-' + str(j) + 
-                    '.pdf',bbox_inches='tight')
+    file = open('../report/media/mnist/network_statistics.txt',"w") 
+    for index, layers in enumerate(layer_testbench):
+        file.write(message[index])
+        for mom in momentum_values:
+            for step in step_size:
+                print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
+                # create neural network
+                network = NeuralNetwork(layers,eta=step,momentum=mom) 
+
+                start_time = time.time()
+                # train network
+                network.train_network(X,Y,batch_size,epochs)
+                end_time = time.time()
+                # classify data
+                Yhat = network.classify_data(X_test)
+                training_accuracy = network.validate_results(Yhat,Y_test) 
+                file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
+                file.write("Percent Correct: " + str(training_accuracy) + "%\n")
+                file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
+
+                # plot error
+                network.plot_error(index,mom,step)    
+
+                plt.savefig('../report/media/mnist/lay-' + str(index) + 
+                        '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
+                        '.pdf',bbox_inches='tight')
+
+        plt.clf()
     
 class NeuralNetwork:
     def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
@@ -112,6 +127,7 @@ class NeuralNetwork:
          
         # create error plot
         print("Final MSE: %f"%(np.mean(self.error_array[-self.MSE_freq:])))
+
         plot = self.error_array[::-1]
         for i in range(0,len(plot),self.MSE_freq):
             self.error_plot.append(np.mean(plot[i:i+self.MSE_freq]))
@@ -142,8 +158,10 @@ class NeuralNetwork:
                     self.eta * dE_dWeight
             layer.W += - layer.momentum_matrix
 
-        # self.error_array.append(-np.mean(np.sum(np.log(Yhat)*Y)))
-        self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
+        # self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
+        for indx,yhat in enumerate(Yhat):
+            self.error_array.append((yhat-Y[indx])*(yhat-Y[indx]))
+
 
     def stable_softmax(self, X):
         exp_norm = np.exp(X - np.max(X))
@@ -153,7 +171,7 @@ class NeuralNetwork:
         plt.plot(range(len(self.error_plot)), self.error_plot)
         plt.title("Mean Squared Error for Net " + str(index) + 
                 " Momentum " + str(momentum) + " and Step " + str(eta))
-        plt.xlabel("Average MSE per %d training"%(self.MSE_freq))
+        plt.xlabel("Average MSE per size %d Training Set"%(self.MSE_freq))
         plt.ylabel("Percent")
 
     def write_network_values(self, filename):
