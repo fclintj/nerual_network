@@ -9,31 +9,35 @@ from   tensorflow.examples.tutorials.mnist import input_data
 import time
 
 def main():
-    num_inputs = 784 
-    num_outputs= 10 
-    batch_size = 2000
-    epochs = 1800
+    num_inputs = 2
+    num_outputs= 2 
+    batch_size = 200
+    epochs = 15000
 
     # open mnist data
-    X,Y,X_test,Y_test = get_mnist_train("./data")
+    # X,Y,X_test,Y_test = get_mnist_train("./data")
+
+    X,Y = get_moon_class_data()
+    X_test,Y_test = get_moon_gendata()
 
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 300 
+    num_neurons = 5
 
     # first layer tests
-    layers0 = [layer(num_inputs,num_neurons,relu)]
-    layers0.append(layer(num_neurons,num_outputs,relu))
+    layers = [layer(num_inputs,num_neurons,sig)]
+    layers.append(layer(num_neurons,10,sig))
+    layers.append(layer(10,num_outputs,sig))
 
-    file = open('../report/media/mnist/network_statistics_adjusted.txt',"w") 
+    file = open('../report/media/mnist/network_statistics_two_class.txt',"w") 
     index = 0
     i = 0.8
-    for j in np.arange(0.7,0.95,0.1):
-        print("Currently on layer " + str(index) + " momentum " + str(i) + " step size " + str(j))
+    for j in np.arange(0.4,0.9,0.2):
+        print("Two Class Classifier " + str(index) + " momentum " + str(i) + " step size " + str(j))
         # create neural network
-        network = NeuralNetwork(layers0,eta=j,momentum=i) 
+        network = NeuralNetwork(layers,eta=j,momentum=i) 
 
         start_time = time.time()
         # train network
@@ -49,7 +53,7 @@ def main():
         # plot error
         network.plot_error(index,i,j)    
 
-        plt.savefig('../report/media/mnist/lay-' + str(index) + 
+        plt.savefig('../report/media/mnist/two_class_-' + str(index) + 
                     '-mo-' + str(i) + '-eta-' + str(j) + 
                     '.pdf',bbox_inches='tight')
     
@@ -105,8 +109,8 @@ class NeuralNetwork:
         
         for i in range(epochs):
             batch = np.random.randint(0,X.shape[0],batch_size)
-            self.train_data(X[batch],Y[batch]) 
-            # self.train_data(X,Y) 
+            # self.train_data(X[batch],Y[batch]) 
+            self.train_data(X,Y) 
             if i%print_frequency is 0:
                 print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
          
