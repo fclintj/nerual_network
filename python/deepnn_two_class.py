@@ -147,7 +147,7 @@ class NeuralNetwork:
             layer.W += - layer.momentum_matrix
 
         for indx,yhat in enumerate(Yhat):
-            self.error_array.append((yhat-Y[indx])*(yhat-Y[indx]))
+            self.error_array.append(sum((yhat-Y[indx])*(yhat-Y[indx])))
 
     def stable_softmax(self, X):
         exp_norm = np.exp(X - np.max(X))

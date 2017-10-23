@@ -12,7 +12,8 @@ def main():
     num_inputs = 784 
     num_outputs= 10 
     batch_size = 100
-    epochs = 1300 
+    epochs = 200
+    mse_freq = 50
 
     # open mnist data
     X,Y,X_test,Y_test = get_mnist_train("./data")
@@ -36,17 +37,19 @@ def main():
     message = ["Layer with 1 hidden network (300 neurons).\n",
                 "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
-    momentum_values = [0.8]
+    momentum_values = [0.0,0.8]
     step_size = [0.4,0.7,0.9]
 
-    file = open('../report/media/mnist/network_statistics.txt',"w") 
+    file = open('../report/media/mnist/network_statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
     for index, layers in enumerate(layer_testbench):
         file.write(message[index])
+        plt.clf()
         for mom in momentum_values:
+            plt.clf()
             for step in step_size:
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
                 # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom) 
+                network = NeuralNetwork(layers,eta=step,momentum=mom,MSE_freq=mse_freq) 
 
                 start_time = time.time()
                 # train network
@@ -62,11 +65,11 @@ def main():
                 # plot error
                 network.plot_error(index,mom,step)    
 
-                plt.savefig('../report/media/mnist/lay-' + str(index) + 
+                plt.savefig('../report/media/mnist/bat-' + str(batch_size) + 
+                        '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                         '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                         '.pdf',bbox_inches='tight')
 
-        plt.clf()
     
 class NeuralNetwork:
     def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
@@ -88,7 +91,7 @@ class NeuralNetwork:
         self.layers[-1].num_outputs = self.num_outputs
 
         for layer in self.layers:
-            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_inputs)) 
+            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_neurons)) 
             layer.W = np.random.normal(0,sigma,layer.W.shape)
 
     def forward_prop(self, X):
@@ -160,8 +163,7 @@ class NeuralNetwork:
 
         # self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
         for indx,yhat in enumerate(Yhat):
-            self.error_array.append((yhat-Y[indx])*(yhat-Y[indx]))
-
+            self.error_array.append(sum((Y[indx]-yhat)*(Y[indx]-yhat)))
 
     def stable_softmax(self, X):
         exp_norm = np.exp(X - np.max(X))
@@ -323,10 +325,6 @@ def relu_der(X):
     X[X<0]=0
     return X
 
-def stable_softmax_func(x):
-    shiftx = x - np.max(x)
-    exps = np.exp(shiftx)
-    return exps / np.sum(exps)
 
 def softmax_func(x):
     exps = np.exp(x)

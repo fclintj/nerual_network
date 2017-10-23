@@ -80,7 +80,6 @@ softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
 softmax_func	deepnn_two_class.py	/^def softmax_func(x):$/;"	f
 stable_softmax	deepnn.py	/^    def stable_softmax(self, X):$/;"	m	class:NeuralNetwork
 stable_softmax	deepnn_two_class.py	/^    def stable_softmax(self, X):$/;"	m	class:NeuralNetwork
-stable_softmax_func	deepnn.py	/^def stable_softmax_func(x):$/;"	f
 stable_softmax_func	deepnn_two_class.py	/^def stable_softmax_func(x):$/;"	f
 train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_data	deepnn_two_class.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
