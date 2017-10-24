@@ -17,31 +17,32 @@ def main():
 
     # open mnist data
     # X,Y,X_test,Y_test = get_mnist_train("./data")
-    X,Y = get_moon_class_data()
-    X_test,Y_test = get_moon_gendata()
+    X,Y = get_2_class_data() 
 
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 5
+    num_neurons = 2
 
     # first layer tests
-    layers = [layer(num_inputs,num_neurons,sig)]
-    layers.append(layer(num_neurons,num_outputs,sig))
+    layers = [layer(num_inputs,3,sig)]
+    layers.append(layer(3,4,sig))
+    layers.append(layer(4,num_outputs,no_activation))
 
     # create neural network
-    network = NeuralNetwork(layers,eta=1,momentum=0,softmax=False) 
+    network = NeuralNetwork(layers,eta=0.7,momentum=0) 
+    # network.set_initial_conditions()
 
     # train network
-    network.train_network(X,Y,batch_size=batch_size,epochs=epochs)
+    network.train_data(X,Y)
 
     # classify data
-    Yhat = network.classify_data(X_test)
+    Yhat = network.classify_data(X)
     print(Yhat)
 
 class NeuralNetwork:
-    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
+    def __init__(self, layers, softmax=True, momentum=0, eta=0.7, MSE_freq=50):
         self.softmax=softmax
         self.num_layers = len(layers)
         self.num_outputs = layers[self.num_layers-1].num_neurons
@@ -113,23 +114,20 @@ class NeuralNetwork:
         if self.softmax is True:
             # print(self.layers[-1].weight_der)
             
-            dE_dWeight = -np.dot(-dE_dH,self.layers[-1].weight_der) / \
+            dE_dWeight = np.dot(dE_dH,self.layers[-1].weight_der) / \
                           Yhat.shape[0]
-        
-
-            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,(Yhat-Y).T) / \
-                    Yhat.shape[0]
-                
-            self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
-            self.layers[-1].momentum_matrix = dE_dWeight
-
-            # print(self.layers[-1].weight_der)
+            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,(Yhat-Y).T) * 0.01
+            self.layers[-1].W += -self.eta*(dE_dWeight)
             next(iterlayers)
 
         for layer in iterlayers:
             dE_dNet = layer.der(layer.output).T*dE_dH
             dE_dWeight = (np.dot(dE_dNet,layer.weight_der))/layer.weight_der.shape[0]
-            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet)/Yhat.shape[0]
+
+            print(layer.W[:,0:-1].shape)
+            print(dE_dNet.shape)
+            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet)*0.01#/Yhat.shape[0]
+            print(dE_dH)
 
             layer.momentum_matrix = \
                     self.momentum * layer.momentum_matrix + \
@@ -171,9 +169,11 @@ class NeuralNetwork:
         self.layers[0].W[0,:] = [0.4,0.45,1]
         self.layers[0].W[1,:] = [0.5,0.55,1]
         self.layers[0].W[2,:] = [0.6,0.65,1]
-        
+
         self.layers[1].W[0,:] = [0.1,0.15,0.2,1]
         self.layers[1].W[1,:] = [0.25,0.30,.35,1]
+
+        
 
         # self.layers[1].W[0,:] = [1,1,1,1]
         # self.layers[1].W[1,:] = [1,1,1,1]
