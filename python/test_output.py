@@ -9,67 +9,37 @@ from   tensorflow.examples.tutorials.mnist import input_data
 import time
 
 def main():
-    num_inputs = 784 
-    num_outputs= 10 
-    batch_size = 100
-    epochs = 40000
-    mse_freq = 500
+    num_inputs = 2 
+    num_outputs= 2 
+    batch_size = 200
+    epochs = 4500
+    mse_freq = 50
 
     # open mnist data
-    X,Y,X_test,Y_test = get_mnist_train("./data")
+    # X,Y,X_test,Y_test = get_mnist_train("./data")
+    X,Y = get_moon_class_data()
+    X_test,Y_test = get_moon_gendata()
 
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 300 
+    num_neurons = 5
 
     # first layer tests
-    layers0 = [layer(num_inputs,num_neurons,relu)]
-    layers0.append(layer(num_neurons,num_outputs,no_activation))
+    layers = [layer(num_inputs,num_neurons,sig)]
+    layers.append(layer(num_neurons,num_outputs,sig))
 
-    # second layer tests 
-    layers1 = [layer(num_inputs,300,relu)]
-    layers1.append(layer(300,115,relu))
-    layers1.append(layer(115,num_outputs,no_activation))
+    # create neural network
+    network = NeuralNetwork(layers,eta=1,momentum=0,softmax=False) 
 
-    layer_testbench = [layers1] 
-    message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
-                "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
+    # train network
+    network.train_network(X,Y,batch_size=batch_size,epochs=epochs)
 
-    momentum_values = [0.0]
-    step_size = [0.8]
+    # classify data
+    Yhat = network.classify_data(X_test)
+    print(Yhat)
 
-    file = open('../report/media/mnist/network_statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
-    for index, layers in enumerate(layer_testbench):
-        file.write(message[index])
-        plt.clf()
-        for mom in momentum_values:
-            plt.clf()
-            for step in step_size:
-                print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
-                # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom,MSE_freq=mse_freq) 
-
-                start_time = time.time()
-                # train network
-                network.train_network(X,Y,batch_size,epochs)
-                end_time = time.time()
-                # classify data
-                Yhat = network.classify_data(X_test)
-                training_accuracy = network.validate_results(Yhat,Y_test) 
-                file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
-                file.write("Percent Correct: " + str(training_accuracy) + "%\n")
-                file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
-
-                # plot error
-                network.plot_error(index,mom,step)    
-
-                plt.savefig('../report/media/mnist/bat-' + str(batch_size) + 
-                        '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
-                        '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
-                        '.pdf',bbox_inches='tight')
-    
 class NeuralNetwork:
     def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
         self.softmax=softmax
@@ -109,9 +79,8 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epochs):
+    def train_network(self, X, Y, batch_size=200, epochs=100):
         print("Training Data...")
-
         if epochs > 5000:
             print_frequency = epochs/100
             print(print_frequency)
@@ -121,9 +90,9 @@ class NeuralNetwork:
                 print_frequency += 1
         
         for i in range(epochs):
-            batch = np.random.randint(0,X.shape[0],batch_size)
-            self.train_data(X[batch],Y[batch]) 
-            # self.train_data(X,Y) 
+            # batch = np.random.randint(0,X.shape[0],batch_size)
+            # self.train_data(X[batch],Y[batch]) 
+            self.train_data(X,Y) 
             if i%print_frequency is 0:
                 print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
          
@@ -137,20 +106,24 @@ class NeuralNetwork:
 
     def train_data(self, X, Y):
         Yhat = self.forward_prop(X)
-        dE_dH = (Yhat-Y).T
         iterlayers = iter(self.layers[::-1])
+        dE_dH = (Yhat-Y).T
 
         # back propagation
         if self.softmax is True:
+            # print(self.layers[-1].weight_der)
+            
             dE_dWeight = -np.dot(-dE_dH,self.layers[-1].weight_der) / \
-                        self.layers[-1].weight_der.shape[0]
+                          Yhat.shape[0]
+        
 
-            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) / \
+            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,(Yhat-Y).T) / \
                     Yhat.shape[0]
-
+                
             self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
             self.layers[-1].momentum_matrix = dE_dWeight
-            # dE_dH = (Yhat-(Y==1).astype(int))*self.layers[-1].output/Yhat.shape[0]
+
+            # print(self.layers[-1].weight_der)
             next(iterlayers)
 
         for layer in iterlayers:
@@ -161,7 +134,6 @@ class NeuralNetwork:
             layer.momentum_matrix = \
                     self.momentum * layer.momentum_matrix + \
                     self.eta * dE_dWeight
-
             layer.W += - layer.momentum_matrix
 
         # self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
@@ -191,13 +163,23 @@ class NeuralNetwork:
         return training_accuracy
         
     def set_initial_conditions(self):
+        print("Setting manual initial conditions")
         # self.layers[0].W[0,:] = [0.15,0.2,0.35]
         # self.layers[0].W[1,:] = [0.25,0.3,0.35]
         # self.layers[0].W[2,:] = [0.25,0.3,0.35]
 
-        self.layers[0].W[0,:] = [0.1,0.1,0.01]
-        self.layers[0].W[1,:] = [0.2,0.2,0.1 ]
-        self.layers[0].W[2,:] = [0.3,0.3,0.1 ]
+        self.layers[0].W[0,:] = [0.4,0.45,1]
+        self.layers[0].W[1,:] = [0.5,0.55,1]
+        self.layers[0].W[2,:] = [0.6,0.65,1]
+        
+        self.layers[1].W[0,:] = [0.1,0.15,0.2,1]
+        self.layers[1].W[1,:] = [0.25,0.30,.35,1]
+
+        # self.layers[1].W[0,:] = [1,1,1,1]
+        # self.layers[1].W[1,:] = [1,1,1,1]
+        # self.layers[0].W[0,:] = [1,0.1,0.01]
+        # self.layers[0].W[1,:] = [2,0.2,0.1 ]
+        # self.layers[0].W[2,:] = [3,0.3,0.1 ]
         
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
@@ -391,17 +373,28 @@ def get_mnist_train(file_path):
     return X,Y,X_test,Y_test
 
 def get_2_class_data():
+    # X = np.array([[0.05, 0.1],
+    #               [0.05, 0.1],
+    #               [0.05, 0.1],
+    #               [0.05, 0.1]])
+    #
+    # Y = np.array([[0.01, 0.99],
+    #               [0.01, 0.99],
+    #               [0.01, 0.99],
+    #               [0.01, 0.99]])
+
     X = np.array([[0.05, 0.1],
-                  [0.07, 0.1],
+                  [0.05, 0.1],
                   [0.05, 0.1],
                   [0.05, 0.1],
                   [0.05, 0.1]])
 
-    Y = np.array([[0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99],
-                  [0.01, 0.99]])
+    Y = np.array([[0, 1],
+                  [0, 1],
+                  [0, 1],
+                  [0, 1],
+                  [0, 1]])
+
     return X,Y
 
 def get_3_class_data():

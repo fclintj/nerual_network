@@ -9,67 +9,91 @@ from   tensorflow.examples.tutorials.mnist import input_data
 import time
 
 def main():
-    num_inputs = 784 
-    num_outputs= 10 
-    batch_size = 100
-    epochs = 40000
-    mse_freq = 500
+    num_inputs = 2 
+    num_outputs= 2
+    batch_size = 200
+    epochs = 2000
+    mse_freq = 800
 
     # open mnist data
-    X,Y,X_test,Y_test = get_mnist_train("./data")
+    X,Y = get_moon_class_data()
+    X_test,Y_test = get_moon_gendata()
 
+    # initialize 
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
     
-    num_neurons = 300 
-
     # first layer tests
-    layers0 = [layer(num_inputs,num_neurons,relu)]
-    layers0.append(layer(num_neurons,num_outputs,no_activation))
+    layers0 = [layer(num_inputs,5,sig)]
+    layers0.append(layer(5,num_outputs,sig))
 
     # second layer tests 
-    layers1 = [layer(num_inputs,300,relu)]
-    layers1.append(layer(300,115,relu))
-    layers1.append(layer(115,num_outputs,no_activation))
+    layers1 = [layer(num_inputs,5,sig)]
+    layers1.append(layer(5,10,sig))
+    layers1.append(layer(10,2,sig))
 
-    layer_testbench = [layers1] 
-    message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
-                "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
+    layer_testbench = [layers0,layers1] 
 
-    momentum_values = [0.0]
-    step_size = [0.8]
+    message = ["Two class layer with 1 hidden network (5 neurons). Epochs " +  "\n",
+                "\nTwo class layer with 2 hidden networks (5 and 10 neurons respectively).\n"]
 
-    file = open('../report/media/mnist/network_statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
+    momentum_values = [0.0,0.8]
+    step_size = [0.4,0.7,0.9]
+
+    file = open('../report/media/two-class/two-class-network-statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
+
     for index, layers in enumerate(layer_testbench):
         file.write(message[index])
         plt.clf()
         for mom in momentum_values:
-            plt.clf()
             for step in step_size:
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
+
                 # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom,MSE_freq=mse_freq) 
+                network = NeuralNetwork(layers,eta=step,momentum=mom,softmax=False) 
 
                 start_time = time.time()
                 # train network
-                network.train_network(X,Y,batch_size,epochs)
+                network.train_network(X,Y,batch_size=batch_size,
+                                      epochs=epochs,MSE_freq=mse_freq)
                 end_time = time.time()
+
                 # classify data
                 Yhat = network.classify_data(X_test)
                 training_accuracy = network.validate_results(Yhat,Y_test) 
+                 
                 file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
                 file.write("Percent Correct: " + str(training_accuracy) + "%\n")
                 file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
 
-                # plot error
-                network.plot_error(index,mom,step)    
-
-                plt.savefig('../report/media/mnist/bat-' + str(batch_size) + 
+                # plot data points and graph boundaries
+                plt.figure(1)
+                plt.clf()
+                plot_data(X[0:100],X[100:200]) 
+                xtot = np.r_[X,X_test] 
+                xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
+                ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
+                plot_boundaries(xlim,ylim,network.classify_data)
+                plt.savefig('../report/media/two-class/two-c-bat-' + str(batch_size) + 
                         '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                         '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                         '.pdf',bbox_inches='tight')
-    
+                plt.clf()
+
+                plt.figure(2)
+                # plot error and graph boundaries
+                network.plot_error(index,mom,step,training_accuracy)    
+                 
+            # save error plot
+            plt.title("MSE for Momentum= " + str(mom) + 
+                      ", Step=" + str(step_size))
+            plt.savefig('../report/media/two-class/two-c-bat-' + str(batch_size) + 
+                      '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
+                      '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
+                      '.pdf',bbox_inches='tight')
+            plt.clf()
+
 class NeuralNetwork:
     def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
         self.softmax=softmax
@@ -109,8 +133,9 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size, epochs):
-        print("Training Data...")
+    def train_network(self, X, Y, batch_size=100, 
+                      epochs=100, MSE_freq=600):
+        print("Training Data..."); self.MSE_freq = MSE_freq 
 
         if epochs > 5000:
             print_frequency = epochs/100
@@ -122,8 +147,8 @@ class NeuralNetwork:
         
         for i in range(epochs):
             batch = np.random.randint(0,X.shape[0],batch_size)
-            self.train_data(X[batch],Y[batch]) 
-            # self.train_data(X,Y) 
+            # self.train_data(X[batch],Y[batch]) 
+            self.train_data(X,Y) 
             if i%print_frequency is 0:
                 print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
          
@@ -150,7 +175,6 @@ class NeuralNetwork:
 
             self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
             self.layers[-1].momentum_matrix = dE_dWeight
-            # dE_dH = (Yhat-(Y==1).astype(int))*self.layers[-1].output/Yhat.shape[0]
             next(iterlayers)
 
         for layer in iterlayers:
@@ -172,12 +196,10 @@ class NeuralNetwork:
         exp_norm = np.exp(X - np.max(X))
         return exp_norm / np.sum(exp_norm, axis=1).reshape((-1,1))
 
-    def plot_error(self,index,momentum,eta):
+    def plot_error(self,index,momentum,eta,training_accuracy):
         plt.plot(range(len(self.error_plot)), self.error_plot)
-        plt.title("Mean Squared Error for Net " + str(index) + 
-                " Momentum " + str(momentum) + " and Step " + str(eta))
-        plt.xlabel("Average MSE per size %d Training Set"%(self.MSE_freq))
-        plt.ylabel("Percent")
+        plt.xlabel("Mean set for %d Training Samples"%(self.MSE_freq))
+        plt.ylabel("Mean Squared Error")
 
     def write_network_values(self, filename):
         pickle.dump(self, open(filename, "we"))
@@ -288,7 +310,7 @@ def plot_data(x0,x1):
     plt.scatter(x1[:,0],x1[:,1],c='blue',label='$x_1$')
     plt.xlabel('X Coordinate') 
     plt.ylabel('Y Coordinate') 
-    plt.title("Neural Network 2 Class Boundary")
+    plt.title("Neural Network (Two-class Boundary)")
     plt.legend()
 
 def plot_boundaries(xlim, ylim, equation):
@@ -310,7 +332,6 @@ def plot_boundaries(xlim, ylim, equation):
     plt.scatter(red_pts[0,:],red_pts[1,:],color='red',s=0.25)
     plt.xlim(xlim)
     plt.ylim(ylim)
-    plt.show()
 
 def sigmoid_func(x):
     return 1/(1+np.exp(-x))
