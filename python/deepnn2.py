@@ -12,14 +12,14 @@ def main():
     num_inputs = 2 
     num_outputs= 2
     batch_size = 200
-    epochs = 2000
+    epochs = 2500
     mse_freq = 800
 
     # open mnist data
     X,Y = get_moon_class_data()
     X_test,Y_test = get_moon_gendata()
 
-    # initialize 
+    # initialize activation functions
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)

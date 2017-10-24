@@ -9,7 +9,7 @@ NeuralNetwork	deepnn2.py	/^class NeuralNetwork:$/;"	c
 NeuralNetwork	deepnn_two_class.py	/^class NeuralNetwork:$/;"	c
 NeuralNetwork	test_output.py	/^class NeuralNetwork:$/;"	c
 __init__	deepnn.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
-__init__	deepnn.py	/^    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):$/;"	m	class:NeuralNetwork
+__init__	deepnn.py	/^    def __init__(self, layers, softmax=True, momentum=0, $/;"	m	class:NeuralNetwork
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __init__	deepnn2.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
@@ -161,7 +161,7 @@ train_data	deepnn.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_data	deepnn2.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_data	deepnn_two_class.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_data	test_output.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
-train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size, epochs):$/;"	m	class:NeuralNetwork
+train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):$/;"	m	class:NeuralNetwork
 train_network	deepnn2.py	/^    def train_network(self, X, Y, batch_size=100, $/;"	m	class:NeuralNetwork
 train_network	deepnn_two_class.py	/^    def train_network(self, X, Y, batch_size, epochs):$/;"	m	class:NeuralNetwork
 train_network	test_output.py	/^    def train_network(self, X, Y, batch_size=200, epochs=100):$/;"	m	class:NeuralNetwork
