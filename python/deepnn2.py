@@ -11,13 +11,12 @@ import time
 def main():
     num_inputs = 2 
     num_outputs= 2
-    batch_size = 200
-    epochs = 2500
-    mse_freq = 800
+    batch_size = 1 
+    epochs = 600
+    mse_freq = 2000
 
     # open mnist data
-    X,Y = get_moon_class_data()
-    X_test,Y_test = get_moon_gendata()
+    X,Y,X_test,Y_test = get_classasgn_80_20()
 
     # initialize activation functions
     relu = activation_function(relu_func,relu_der)
@@ -31,7 +30,7 @@ def main():
     # second layer tests 
     layers1 = [layer(num_inputs,5,sig)]
     layers1.append(layer(5,10,sig))
-    layers1.append(layer(10,2,sig))
+    layers1.append(layer(10,num_outputs,sig))
 
     layer_testbench = [layers0,layers1] 
 
@@ -41,7 +40,7 @@ def main():
     momentum_values = [0.0,0.8]
     step_size = [0.4,0.7,0.9]
 
-    file = open('../report/media/two-class/two-class-network-statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
+    file = open('../report/media/two-class-80-20/two-class-net-80-20-statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
 
     for index, layers in enumerate(layer_testbench):
         file.write(message[index])
@@ -51,10 +50,10 @@ def main():
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
 
                 # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom,softmax=False) 
+                network = NeuralNetwork(layers,eta=step,momentum=mom) 
 
-                start_time = time.time()
                 # train network
+                start_time = time.time()
                 network.train_network(X,Y,batch_size=batch_size,
                                       epochs=epochs,MSE_freq=mse_freq)
                 end_time = time.time()
@@ -75,7 +74,7 @@ def main():
                 xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
                 ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
                 plot_boundaries(xlim,ylim,network.classify_data)
-                plt.savefig('../report/media/two-class/two-c-bat-' + str(batch_size) + 
+                plt.savefig('../report/media/two-class-80-20/two-c-net-80-20-bat-' + str(batch_size) + 
                         '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                         '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                         '.pdf',bbox_inches='tight')
@@ -83,29 +82,30 @@ def main():
 
                 plt.figure(2)
                 # plot error and graph boundaries
-                network.plot_error(index,mom,step,training_accuracy)    
+                network.plot_error(index,mom,step)    
                  
-            # save error plot
+            # save combined error plots
             plt.title("MSE for Momentum= " + str(mom) + 
                       ", Step=" + str(step_size))
-            plt.savefig('../report/media/two-class/two-c-bat-' + str(batch_size) + 
+            plt.savefig('../report/media/two-class-80-20/two-c-error-80-20-bat-' + str(batch_size) + 
                       '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                       '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                       '.pdf',bbox_inches='tight')
             plt.clf()
 
 class NeuralNetwork:
-    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):
-        self.softmax=softmax
-        self.num_layers = len(layers)
+    def __init__(self, layers, softmax=True, momentum=0, 
+                 eta=0.1, MSE_freq=50, reg=0.001):
+        self.num_layers  = len(layers)
         self.num_outputs = layers[self.num_layers-1].num_neurons
-        self.layers = layers
-        self.momentum = momentum
-        self.eta = eta 
-        self.softmax = softmax 
-        self.error_plot = [] 
         self.error_array = [] 
+        self.error_plot  = [] 
+        self.momentum = momentum
         self.MSE_freq = MSE_freq
+        self.softmax= softmax
+        self.layers = layers
+        self.reg = reg
+        self.eta = eta 
         self.__set_GRV_starting_weights()
 
     def __set_GRV_starting_weights(self):
@@ -133,25 +133,29 @@ class NeuralNetwork:
         class_type = np.argmax(Yhat,axis=1)
         return class_type
 
-    def train_network(self, X, Y, batch_size=100, 
-                      epochs=100, MSE_freq=600):
-        print("Training Data..."); self.MSE_freq = MSE_freq 
+    def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):
+        self.MSE_freq = MSE_freq * batch_size
+        print("Training Data...")
 
-        if epochs > 5000:
-            print_frequency = epochs/100
-            print(print_frequency)
+        # definition of iterations with mini-batch = N/B*epochs
+        # itrs_per_epoch = int(np.ceil(X.shape[0]/float(batch_size)))
+        total_itrs = epochs
+
+        if total_itrs > 5000:
+            print_frequency = total_itrs/100
         else:
-            print_frequency = epochs/10
+            print_frequency = total_itrs/10
             if print_frequency is 0:
                 print_frequency += 1
         
-        for i in range(epochs):
+        completed_epocs = 0
+        for i in range(total_itrs):
             batch = np.random.randint(0,X.shape[0],batch_size)
             # self.train_data(X[batch],Y[batch]) 
             self.train_data(X,Y) 
             if i%print_frequency is 0:
-                print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
-         
+                print("Iteration %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
+
         # create error plot
         print("Final MSE: %f"%(np.mean(self.error_array[-self.MSE_freq:])))
 
@@ -167,28 +171,33 @@ class NeuralNetwork:
 
         # back propagation
         if self.softmax is True:
-            dE_dWeight = -np.dot(-dE_dH,self.layers[-1].weight_der) / \
-                        self.layers[-1].weight_der.shape[0]
+            # divide by number of incoming batch size to regularize
+            dE_dWeight = (-np.dot(-dE_dH,self.layers[-1].weight_der) / \
+                          self.layers[-1].weight_der.shape[0])
 
-            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) / \
-                    Yhat.shape[0]
+            # do not include the bias weights--not needed and will be updated later 
+            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) * self.reg 
 
-            self.layers[-1].W += -self.eta*(dE_dWeight + self.momentum*self.layers[-1].momentum_matrix)
+            # update current weights with momentum
+            self.layers[-1].W += -self.eta*(dE_dWeight + \
+                    self.momentum*self.layers[-1].momentum_matrix)
             self.layers[-1].momentum_matrix = dE_dWeight
-            next(iterlayers)
+
+            # skip the last layer if softmax
+            next(iterlayers) 
 
         for layer in iterlayers:
             dE_dNet = layer.der(layer.output).T*dE_dH
-            dE_dWeight = (np.dot(dE_dNet,layer.weight_der))/layer.weight_der.shape[0]
-            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet)/Yhat.shape[0]
+            dE_dWeight = (np.dot(dE_dNet,layer.weight_der)) / \
+                layer.weight_der.shape[0]
 
+            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet) * self.reg 
+
+            layer.W += -layer.momentum_matrix
             layer.momentum_matrix = \
                     self.momentum * layer.momentum_matrix + \
                     self.eta * dE_dWeight
 
-            layer.W += - layer.momentum_matrix
-
-        # self.error_array.append(np.mean(sum((Yhat-Y).T*(Yhat-Y).T)))
         for indx,yhat in enumerate(Yhat):
             self.error_array.append(sum((Y[indx]-yhat)*(Y[indx]-yhat)))
 
@@ -196,7 +205,7 @@ class NeuralNetwork:
         exp_norm = np.exp(X - np.max(X))
         return exp_norm / np.sum(exp_norm, axis=1).reshape((-1,1))
 
-    def plot_error(self,index,momentum,eta,training_accuracy):
+    def plot_error(self,index,momentum,eta):
         plt.plot(range(len(self.error_plot)), self.error_plot)
         plt.xlabel("Mean set for %d Training Samples"%(self.MSE_freq))
         plt.ylabel("Mean Squared Error")

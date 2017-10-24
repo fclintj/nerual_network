@@ -11,9 +11,9 @@ import time
 def main():
     num_inputs = 784 
     num_outputs= 10 
-    batch_size = 100
-    epochs = 1
-    mse_freq = 50
+    batch_size = 200
+    epochs = 60
+    mse_freq = 100
 
     # open mnist data
     X,Y,X_test,Y_test = get_mnist_train("./data")
@@ -24,22 +24,22 @@ def main():
     no_activation = activation_function(return_value,return_value)
     
     num_neurons = 300 
-
     # first layer tests
     layers0 = [layer(num_inputs,num_neurons,relu)]
     layers0.append(layer(num_neurons,num_outputs,no_activation))
 
     # second layer tests 
     layers1 = [layer(num_inputs,300,relu)]
-    layers1.append(layer(300,115,relu))
-    layers1.append(layer(115,num_outputs,no_activation))
+    layers1.append(layer(300,100,relu))
+    layers1.append(layer(100,num_outputs,no_activation))
 
+    # set up test bench
     layer_testbench = [layers0,layers1] 
     message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
                 "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
-    momentum_values = [0.0,0.8]
-    step_size = [0.4,0.7,0.9]
+    momentum_values = [0.8]
+    step_size = [0.9]
 
     file = open('../report/media/mnist/ten-class-network_statistics-bat-' + str(batch_size) + 
                 '-mse-' + str(mse_freq) + '.txt',"w") 
@@ -54,8 +54,8 @@ def main():
                 # create neural network
                 network = NeuralNetwork(layers,eta=step,momentum=mom) 
 
-                start_time = time.time()
                 # train network
+                start_time = time.time()
                 network.train_network(X,Y,batch_size=batch_size,
                                       epochs=epochs,MSE_freq=mse_freq)
                 end_time = time.time()
@@ -64,21 +64,22 @@ def main():
                 Yhat = network.classify_data(X_test)
                 training_accuracy = network.validate_results(Yhat,Y_test) 
                  
+                # write statistics
                 file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
                 file.write("Percent Correct: " + str(training_accuracy) + "%\n")
                 file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
 
-                # plot error and graph boundaries
+                # plot error
                 network.plot_error(index,mom,step)    
                  
-            # save error plot
+            # save combined error plots
             plt.title("MSE for Momentum= " + str(mom) + 
                       ", Step=" + str(step_size))
             plt.savefig('../report/media/mnist/ten-c-bat-' + str(batch_size) + 
                       '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                       '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                       '.pdf',bbox_inches='tight')
-            plt.clf()
+            # plt.clf()
 
 class NeuralNetwork:
     def __init__(self, layers, softmax=True, momentum=0, 
@@ -121,11 +122,12 @@ class NeuralNetwork:
         return class_type
 
     def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):
-        self.MSE_freq = MSE_freq; MSE_freq=MSE_freq*batch_size 
+        self.MSE_freq = MSE_freq * batch_size
         print("Training Data...")
-        
+
         # definition of iterations with mini-batch = N/B*epochs
-        total_itrs = np.ceil(X.shape[0]/float(batch_size)) * epochs
+        itrs_per_epoch = int(np.ceil(X.shape[0]/float(batch_size)))
+        total_itrs = itrs_per_epoch * epochs
 
         if total_itrs > 5000:
             print_frequency = total_itrs/100
@@ -134,13 +136,18 @@ class NeuralNetwork:
             if print_frequency is 0:
                 print_frequency += 1
         
-        for i in range(int(total_itrs)):
+        completed_epocs = 0
+        for i in range(total_itrs):
             batch = np.random.randint(0,X.shape[0],batch_size)
             self.train_data(X[batch],Y[batch]) 
-            # self.train_data(X,Y) 
+            if i%itrs_per_epoch is 0:
+                print("Epoch %d. MSE: %f"%(completed_epocs, np.mean(self.error_array[-self.MSE_freq:])))
+                completed_epocs += 1 
+
             if i%print_frequency is 0:
-                print("Epoch %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
-         
+                print("Iteration %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
+
+
         # create error plot
         print("Final MSE: %f"%(np.mean(self.error_array[-self.MSE_freq:])))
 

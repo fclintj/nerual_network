@@ -13,7 +13,7 @@ __init__	deepnn.py	/^    def __init__(self, layers, softmax=True, momentum=0, $/
 __init__	deepnn.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __init__	deepnn2.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
-__init__	deepnn2.py	/^    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):$/;"	m	class:NeuralNetwork
+__init__	deepnn2.py	/^    def __init__(self, layers, softmax=True, momentum=0, $/;"	m	class:NeuralNetwork
 __init__	deepnn2.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn2.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __init__	deepnn_two_class.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
@@ -113,7 +113,7 @@ plot_data	deepnn2.py	/^def plot_data(x0,x1):$/;"	f
 plot_data	deepnn_two_class.py	/^def plot_data(x0,x1):$/;"	f
 plot_data	test_output.py	/^def plot_data(x0,x1):$/;"	f
 plot_error	deepnn.py	/^    def plot_error(self,index,momentum,eta):$/;"	m	class:NeuralNetwork
-plot_error	deepnn2.py	/^    def plot_error(self,index,momentum,eta,training_accuracy):$/;"	m	class:NeuralNetwork
+plot_error	deepnn2.py	/^    def plot_error(self,index,momentum,eta):$/;"	m	class:NeuralNetwork
 plot_error	deepnn_two_class.py	/^    def plot_error(self,index,momentum,eta):$/;"	m	class:NeuralNetwork
 plot_error	test_output.py	/^    def plot_error(self,index,momentum,eta):$/;"	m	class:NeuralNetwork
 print_digits	deepnn.py	/^def print_digits(X,ordered,m,n):$/;"	f
@@ -162,7 +162,7 @@ train_data	deepnn2.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwor
 train_data	deepnn_two_class.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_data	test_output.py	/^    def train_data(self, X, Y):$/;"	m	class:NeuralNetwork
 train_network	deepnn.py	/^    def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):$/;"	m	class:NeuralNetwork
-train_network	deepnn2.py	/^    def train_network(self, X, Y, batch_size=100, $/;"	m	class:NeuralNetwork
+train_network	deepnn2.py	/^    def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):$/;"	m	class:NeuralNetwork
 train_network	deepnn_two_class.py	/^    def train_network(self, X, Y, batch_size, epochs):$/;"	m	class:NeuralNetwork
 train_network	test_output.py	/^    def train_network(self, X, Y, batch_size=200, epochs=100):$/;"	m	class:NeuralNetwork
 validate_results	deepnn.py	/^    def validate_results(self, Yhat, Y):$/;"	m	class:NeuralNetwork
