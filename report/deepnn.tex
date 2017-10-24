@@ -164,15 +164,16 @@
         % \renewcommand{\thesubsection}{\normalsize\hspace{-1em}}
 
         % makes subsection appear in-line
-        \renewcommand\subsection{\@startsection{subsubsection}{4}{\z@}%
-                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
-                                     {-1.5ex \@plus -.2ex}% Formerly 1.5ex \@plus .2ex
-                                     {\normalfont\normalsize\bfseries}}        \renewcommand{\thesubsection}{\hspace{-1em}}
+        % \renewcommand\subsection{\@startsection{subsubsection}{4}{\z@}%
+        % {-3.25ex\@plus -1ex \@minus -.2ex}%
+        % {-1.5ex \@plus -.2ex}% Formerly 1.5ex \@plus .2ex
+        % {\normalfont\normalsize\bfseries}}        
+        % \renewcommand{\thesubsection}{\hspace{-1em}}
 
-                                     % turns off section numbers
-                                     % \renewcommand{\thesection}{\hspace{-1em}}
-                                     % \renewcommand{\partname}{}
-                                     % \renewcommand{\thepart}{}
+        % turns off section numbers
+        % \renewcommand{\thesection}{\hspace{-1em}}
+        % \renewcommand{\partname}{}
+        % \renewcommand{\thepart}{}
 
         \newgeometry{left=1in,bottom=1in,right=1in,top=1in} % page dims
         \setlength\parindent{0pt}	% set no tab on new paragraphs
@@ -261,32 +262,33 @@
 %  └────────────────────────┘
     \DeclareDocumentCommand{\summary}{} {
         \section{Summary}\label{sec:summary}
-        Neural Networks have applications in image recognition, data compression, and even stock market prediction. The basic concept behind Neural Networks is simply depicted as seen on the main figure of title page. This paper presents the basic structure for machine learning on classified data using a randomly generated data-set (2-classes), and the MNIST data-set (10 classes).
+        Neural Networks have applications in image recognition, data compression, and even stock market prediction. The basic concept behind Neural Networks is depicted on the main figure of the title page. This paper presents the basic structure for machine learning on classified data using a randomly generated data-set (2-classes), and the MNIST data-set (10 classes).
 
-        The MNIST data-set consists of 70,000 small images of digits handwritten by high school students and employees of the US Census Bureau. Each image is 28 × 28 so that when it is vectorized it has dimension 784. The MNIST data-set is ideal for machine learning because of the variable nature of handwriting and the limited classes of numbers.
+        The MNIST data-set consists of 70,000 small images of digits 0-9 handwritten by high school students and employees of the US Census Bureau. Each image is $28 \times 28$ pixels so that when the image is vectorized it has a dimension $1 \times 784$. The MNIST data-set is ideal for machine learning because of the variable nature of handwriting and the limited numbers of classes.
 
         Ten numbers from the data-set can been seen in \reff{fig:mnist}.
 
         \newFigure{./media/mnist.png}{10 Digits from the MNIST Data-set}{.6}{fig:mnist}
-        The remainder of the paper will be dedicated to analyzing the effectiveness of Neural Networks in identifying correctly different classes of data such as the numbers seen in \reff{fig:mnist}.
+        The remainder of the paper will be dedicated to analyzing how effective Neural Networks are at correctly identifying different classes of data seen in \reff{fig:mnist}.
     } 
 
     \DeclareDocumentCommand{\program}{} {
         \section{Program Description}\label{sec:program}
         
-        The generic neural network that I wrote can have any number of layers, neurons, and activation function passed to it for an \texttt{n} demensional input with \texttt{k} number of classes. The Network is initialized by specifying  \texttt{num\_inputs}, \texttt{num\_outputs}, \texttt{batch\_size}, and \texttt{epics}.
+        The neural network class that I wrote in \texttt{PYTHON} can have any number of layers, neurons, and any type of activation function passed to it for an \texttt{n} dimensional input with \texttt{k} number of classes. The Network is initialized by specifying  \texttt{num\_inputs}, \texttt{num\_outputs}, \texttt{batch\_size}, and \texttt{epochs}.
         
         In testing the different classes in this paper, the ReLU (Rectified Linear Unit) was used for the majority of the classification problems. 
 
         The desired data is read in, and any activation functions are defined for the different layers. As seen in the heading \texttt{\# input layer}, the layers are created by passing the number of inputs that they will receive, the number of desired neurons, and the type of activation function. The final layer seen in the code snippet below does not have an activation function because by default softmax is run on the output of the network. In this way, the output option can easily be changed between the softmax and sigmoid functions.
-        
-        Additional parameters exist for the initialization of the network, but they are optional parameters. Such variables include the momentum $\beta$ and step size $\eta$, as seen in the initialization of the Neural Network.
+
+        Additional parameters exist for the initialization of the network, but they are optional parameters. Such variables include the momentum $\beta$, step size $\eta$, and regularization $reg$ as seen in the initialization of the Neural Network.
 
         \lstinputlisting[language=Python,firstline=12,lastline=39,]{../python/deepnn.py}
 
-        For a full description of the different classes, such as the class \texttt{layer} and \texttt{activation\_function}, see \reff{app:code-listing}. 
+        For a full description of the different classes, such as the class \texttt{layer} and \texttt{activation\_function} used in the \texttt{NeuralNetwork} class, see \reff{app:code-listing:ten-class}. 
 
-        The Training of the system is done by back propagation, which will be discusses in later detail later on.
+        % TODO: Write about the procedure of how I do the matrix operations.
+        The Training of the system is done using back propagation with gradient decent and mini-batches. Lines... TODO: 
     }
 
     \DeclareDocumentCommand{\twoclass}{} {
@@ -295,24 +297,46 @@
 
         \lstinputlisting[language=Python,firstline=274,lastline=302,]{../python/deepnn.py}
 
-        The network trained the data using sigmoid functions, and it produced the output seen in \reff{fig:two-class-bound}:
+        The network trained the data using sigmoid functions, and it produced the output seen in \reff{fig:two-class-bound}. Note that the step size was increased to 0.4, 0.7, and 0.9 with colors blue, green, and red respectively. 
         
         \newFigureTwo
-        {./media/two-class-bound.pdf}{80\% Training Data, 20\% Testing Data}{.9}
-        {./media/two-class-bound-mse.pdf}{Mean Squared Error for 80\%, 20\% Data}{.9}
-        {Trained Output for 80 Training Data, 20 Testing Data with 0.8 Momentum}{fig:two-class-bound}
+        {./media/two-class-80-20/two-c-net-80-20-bat-1-mse-2000-lay-0-mo-0-eta-4.pdf}{80\% Training Data, 20\% Testing Data}{.9}
+        {./media/two-class-80-20/two-c-error-80-20-bat-1-mse-2000-lay-0-mo-0-eta-9.pdf}{Mean Squared Error with 0 Momentum and 0.4,0.7 and 0.9 step size}{.9}
+        {Trained Output for 80 Training Data, 20 Testing Data with 0.0 Momentum}{fig:two-class-80-20-0-momentum}
+
+
+        I ran the same batch of data with 0.8 momentum and received the following results for the plot and MSE seen in \reff{fig:two-class-80-20-8-momentum}
+
+        \newFigureTwo
+        {./media/two-class-80-20/two-c-net-80-20-bat-1-mse-2000-lay-0-mo-8-eta-7.pdf}{80\% Training Data, 20\% Testing Data}{.9}
+        {./media/two-class-80-20/two-c-error-80-20-bat-1-mse-2000-lay-0-mo-8-eta-9.pdf}{Mean Squared Error with 0 Momentum and 0.4,0.7 and 0.9 step size}{.9}
+        {Trained Output for 80 Training Data, 20 Testing Data with 0.0 Momentum}{fig:two-class-80-20-8-momentum}
         
-        The resulting listing from the program showed that it correctly classified the small batch of test data with only 3 mistakes with a 92.5\% accuracy. 
+        
+        \subsection{Increasing Network Complexity}
+        To increase the complexity, I introduced more neurons by making a layer that had 5 neurons connected to sigmoid functions, and 10 more neurons with a sigmoid functions that converged to a sigmoid output.
 
-        \lstinputlisting[language={}]{./media/two-class-boud-output.txt}
+        The increased complexity did not increase the accuracy in this case because the three points that were miss-classified seemed to be far from the other data. It did increase the accuracy in the test data described in \reff{sub:comp-nn-class}, and it did produce a new plot of MSE. Note that \reff{fig:fig:two-class-80-20-8-momentum-layer1} does not converge as fast as the other plots do to the increased complexity.
 
-        In previous processing, I found that the classification methods in \reff{tab:compare} performed with the following errors in percent. Note that the Bayes Optimal Classifier performed the best because it knew the true distribution of the data. 
+        \newFigureTwo
+        {./media/two-class-80-20/two-c-net-80-20-bat-1-mse-2000-lay-1-mo-8-eta-7.pdf}{80\% Training Data, 20\% Testing Data}{.9}
+        {./media/two-class-80-20/two-c-error-80-20-bat-1-mse-2000-lay-1-mo-8-eta-9.pdf}{Mean Squared Error with 0 Momentum and 0.4,0.7 and 0.9 step size}{.9}
+        {Trained Output for 80\% Training Data, 20\%  Testing Data with 0.8 Momentum and an Additional Layer with 10 Neurons}{fig:two-class-80-20-8-momentum-layer1}
+
+
+        The resulting listing from the program showed that it correctly classified the small batch of test data with only 3 mistakes with a 92.5\% accuracy in each case because there were sufficient testing samples. The following listing shows how each layer performed with varying step sizes.
+
+        \lstinputlisting[language={}]{./media/two-class-80-20/two-class-net-80-20-statistics-bat-1-mse-2000.txt}
+
+
+        \subsection{Comparing a Neural Network to Other Classifiers}\label{sub:comp-nn-class}
+        In previous processing, I found that other classification methods performed with following errors in percent as seen in \reff{tab:compare}. Note that the Bayes Optimal Classifier performed the best because it knew the true distribution of the data. 
 
         \begin{table}[H]
             \begin{tabulary}{\linewidth}{rccc}	
                 && \multicolumn{2}{c}                   {Errors in \%}      \\
                 \toprule % --------------------------------------------------
-                        Method	            & Run-time &    Training  &  Test     \\ 
+                        Method	            & train+run time  &    Training  &  Test     \\ 
                 \toprule % ---------------------------------------------------
                 Linear Regression 		        &  1.23s   &      14.5    &  20.49    \\
                 Quadratic Regression	        &  1.70s   &      14.5    &  20.44    \\
@@ -327,31 +351,72 @@
                 \bottomrule % ------------------------------------------------
             \end{tabulary}\caption{Binary Classifier Performance Comparison}\label{tab:compare}  \end{table} 
 
-        To compare the Neural Network with the other classifiers, I trained on all data points from the \texttt{classasgntrain1.dat} data set and ran it on 20000 randomly generated data points. The results can be seen in \reff{fig:two-class-bound-20000}
+        To compare the Neural Network with the other classifiers, I used \texttt{classasgntrain1.dat} to train all data points from the  data set and tested it on 20000 additional randomly generated data points to simulate the same test performed in the other linear classifiers. The results of this test can be seen in 0 momentum test in \reff{fig:two-class-comp-step-large}. Again, blue corresponds to 0.4, green to 0.7, and red to 0.9.
 
         \newFigureTwo
-        {./media/two-class-20000.pdf}{Training on All 200 data points}{.9}
-        {./media/two-class-20000-mse.pdf}{MSE for the Training Routine}{.9}
-        {Trained Output for 200 Data Points in \texttt{classasgntrain1.dat} with 0.8 Momentum and Step Size of 0.1}{fig:two-class-bound-20000}
-        
-        \lstinputlisting[language={}]{./media/two-class-20000.txt}
+        {./media/two-class/two-c-bat-200-mse-25-lay-0-mo-0-eta-7.pdf}{Plotted Curve of Best Fit}{.9}
+        {./media/two-class/two-c-error-bat-200-mse-25-lay-0-mo-0-eta-9.pdf}{MSE plots for 0.4, 0.7, and 0.9 step sizes}{.9}
+        {Comparison of Two-class Classifier with differing step sizes}{fig:two-class-comp-step-large}
 
-        The Neural Network returned an error of 19.44\%, which puts its results just behind the Bayes Optimal Classifier and the k-nearest neighbor approach. It is also important to note that the momentum term has a significant effect on the speed at which the Mean Squared Error drops. \reff{fig:two-class-comp-momentum} shows the dramatic speed difference that the momentum has on the convergence of the Mean Squared Error. Increasing the momentum to 0.8 did not have a significant effect on the percent of errors. 
+        After adding the new complexity of a new layer in this case, the best result came from the Layer with $0.8$ momentum and a step size of $0.9$. The graph of the results and the corresponding MSE plot can be seen in \reff{fig:two-class-comp-best-large}.
 
         \newFigureTwo
-        {./media/two-class-20000-mse-no-momentum.pdf}{MSE with No Momentum}{.9}
-        {./media/two-class-20000-mse.pdf}{MSE with 0.8 Momentum}{.9}
-        {Comparison of Two-class Classifier with and without Momentum}{fig:two-class-comp-momentum}
+        {./media/two-class/two-c-bat-200-mse-25-lay-0-mo-0-eta-7.pdf}{Plotted Curve of Best Fit}{.9}
+        {./media/two-class/two-c-error-bat-200-mse-25-lay-1-mo-8-eta-9.pdf}{MSE plots for 0.4, 0.7, and 0.9 step sizes}{.9}
+        {Comparison of Two-class Classifier with differing step sizes}{fig:two-class-comp-best-large}
+
+        The Neural Network returned an error of 19.805\%, which puts its results just behind the Bayes Optimal Classifier and the k-nearest neighbor approach. Because the 15-Nearest Neighbor is not practical with large datasets, and because a model for the Bayes Optimal Classifier is often impossible to find, the Neural Network is one of the most viable options to classify data in this data set.
+            
+        \begin{table}[H]
+            \begin{tabulary}{\linewidth}{rccc}	
+                && \multicolumn{2}{c}                   {Errors in \%}      \\
+                \toprule % --------------------------------------------------
+                        Method	            & train+run time &    Training  &  Test     \\ 
+                \toprule % ---------------------------------------------------
+                Bayes Optimal Classifier        &  0.20s   &      14.0    &  19.14    \\
+                15-Nearest Neighbor             &  36.47s  &      16.0    &  19.25    \\
+                NN with 5 N sig, 10 N sig, $\beta=0.8$, $\eta=0.9$ &  2.78s  &     14.0    &  19.805 \\
+                \bottomrule % ------------------------------------------------
+            \end{tabulary}\caption{Binary Classifier Performance Comparison}\label{tab:compare-NN}  \end{table} 
+
+        It is also important to note that the momentum term has a significant effect on the speed at which the Mean Squared Error drops. \reff{fig:two-class-comp-mse} shows the dramatic speed difference that the momentum has on the convergence of the Mean Squared Error. Increasing the momentum to 0.8 did not have a significant effect on the percent of errors, but it did affect the number of iterations for convergence. 
+    
+        \newFigureTwo
+        {./media/two-class/two-c-error-bat-200-mse-25-lay-0-mo-0-eta-9.pdf}{MSE plots for 0.4, 0.7, and 0.9 step sizes with 0 momentum}{.9}
+        {./media/two-class/two-c-error-bat-200-mse-25-lay-0-mo-8-eta-9.pdf}{MSE plots for 0.4, 0.7, and 0.9 step sizes with 0.8 momentum}{.9}
+        {Comparison of Two-class Classifier with differing momentum with a single hidden layer}{fig:two-class-comp-mse}
     }
     
     \DeclareDocumentCommand{\tenclass}{} {
         \section{Ten-class Classifier}\label{sec:ten-class}
         
-        % Now train your neural network using the training data from the MNIST database, using 300 neurons in the hidden layer. Obviously, for the 10 digits, you’ll need to have ten neurons in the output layer, and you should use the softmax function in the output layer.  Use a batch of size 100. Use at least three different values of the step size paremeter. For each of these values of step size parameter, make a plot of the MSE as a function of iteration every 50 iterations. (You may need to experiment to determine how many iterations you need.)
+        To test the MNIST data set, I created a network with 784 inputs, a hidden layer with 300 neurons, and an output of 10 classes connected to a softmax. The Mean Squared Error plot was set up to report the mean of every 50 iterations. As the assignment description asked, I used a texttt{batch\_size} of 100, and plotted the MSE results.
+
+        The number of iterations using mini-batches where $N$ is the total number of data samples and $B$ is the size of your batch size is shows in
+
+            \begin{equation}
+                itrs = N/B \cdot {epochs}
+            \end{equation}
+
+        I printed out the MSE every 50 iterations, as seen in \reff{fig:mnist-comp-mse} for all of my programs, and I combined the increase of my step sizes for the same network with the same momentum.
+
+        The output of the MSE for a single hidden layer with no momentum can now be seen in \reff{fig:mnist-comp-mse}. I graphed each increase of the step size with a new color. The blue line represents a step size of 0.4, the green line represents a step size of 0.7, and the blue line represents a step size of 0.9. Note that the momentum increases the convergence of the MSE graph.
+
+        \newFigureTwo
+        {./media/mnist/ten-c-bat-100-mse-50-lay-0-mo-0-eta-9.pdf}{MSE with 0 Momentum step size}{.8}
+        {./media/mnist/ten-c-bat-100-mse-50-lay-0-mo-8-eta-9.pdf}{MSE comparison of all weights}{.8}
+        {Comparing the Mean Square Error with Momentum 0.0 and 0.8 }{fig:mnist-comp-mse}
+
+        The two networks returned an best accuracy on the test data of 94.82\% (with 0 momentum and a step size of 0.9) and 96.89\% (with 0.8 momentum and a step size of 0.9). The length of the programs can be seen in 
+          
+         
+
+        % Now train your neural network using the training data from the MNIST database, using 300 neurons in the hidden layer. Obviously, for the 10 digits, you’ll need to have ten neurons in the output layer, and you should use the softmax function in the output layer.  Use a batch of size 100. Use at least three different values of the step size parameter. For each of these values of step size parameter, make a plot of the MSE as a function of iteration every 50 iterations. (You may need to experiment to determine how many iterations you need.)
 
         % TODO: Test your neural network using the test data from the MNIST database. Report the probability of successful classification.
 
-        % Comment on how many iterations are needed, and how long (in clock time) it takes to train.  + Create a network with two hidden layers, where the first hidden layer has 5 neurons and the second hidden layer has 10 neurons. (If you didn’t write your code in the first place to accomodate different numbers of layers, after completing this part you may want to re-factor your code so that it can now handle different numbers of layers.) Using the data in classasgntrain1.dat as before, train and test the network and report on the probability of error. Comment on the difference in performance between the one-layer and the two-layer networks.  + Create a network with two hidden layers, with 300 neurons in the first (lowest) hidden layer and 100 neurons in the second hidden layer. Again, try different values of the step size parameter, plotting the MSE as a function of iteration. Use a minibatch of size 100. And again, test using the test data from the MNIST database.  + Train your network using momentum learning with β = 0.8, and repeat the above experiments.  + Turn in answers to questions, program listings, plots, comments, and observations.
+        % Comment on how many iterations are needed, and how long (in clock time) it takes to train.  + Create a network with two hidden layers, where the first hidden layer has 5 neurons and the second hidden layer has 10 neurons. (If you didn’t write your code in the first place to accommodate different numbers of layers, after completing this part you may want to re-factor your code so that it can now handle different numbers of layers.) Using the data in classasgntrain1.dat as before, train and test the network and report on the probability of error. Comment on the difference in performance between the one-layer and the two-layer networks.  + Create a network with two hidden layers, with 300 neurons in the first (lowest) hidden layer and 100 neurons in the second hidden layer. Again, try different values of the step size parameter, plotting the MSE as a function of iteration. Use a minibatch of size 100. And again, test using the test data from the MNIST database.  + Train your network using momentum learning with β = 0.8, and repeat the above experiments.  
+        % + Turn in answers to questions, program listings, plots, comments, and observations.
          
         % Comment on how many iterations are needed, and how long (in clock time) it takes to train.
         % + Create a network with two hidden layers, where the first hidden layer has 5 neurons and the second hidden layer % has 10 neurons. (If you didn’t write your code in the first place to accomodate different numbers of layers, after % completing this part you may want to re-factor your code so that it can now handle different numbers of layers.) % Using the data in classasgntrain1.dat as before, train and test the network and report on the probability % of error. Comment on the difference in performance between the one-layer and the two-layer networks.

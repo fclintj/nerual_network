@@ -35,8 +35,8 @@ def main():
 
     # set up test bench
     layer_testbench = [layers0,layers1] 
-    message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
-                "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
+    # message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
+    #             "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
     momentum_values = [0.8]
     step_size = [0.9]
@@ -45,8 +45,8 @@ def main():
                 '-mse-' + str(mse_freq) + '.txt',"w") 
 
     for index, layers in enumerate(layer_testbench):
-        file.write(message[index])
-        plt.clf()
+        # file.write(message[index])
+        # plt.clf()
         for mom in momentum_values:
             for step in step_size:
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
@@ -65,20 +65,20 @@ def main():
                 training_accuracy = network.validate_results(Yhat,Y_test) 
                  
                 # write statistics
-                file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
-                file.write("Percent Correct: " + str(training_accuracy) + "%\n")
-                file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
-
+                # file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
+                # file.write("Percent Correct: " + str(training_accuracy) + "%\n")
+                # file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
+                #
                 # plot error
-                network.plot_error(index,mom,step)    
+                # network.plot_error(index,mom,step)    
                  
             # save combined error plots
-            plt.title("MSE for Momentum= " + str(mom) + 
-                      ", Step=" + str(step_size))
-            plt.savefig('../report/media/mnist/ten-c-bat-' + str(batch_size) + 
-                      '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
-                      '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
-                      '.pdf',bbox_inches='tight')
+            # plt.title("MSE for Momentum= " + str(mom) + 
+            #           ", Step=" + str(step_size))
+            # plt.savefig('../report/media/mnist/ten-c-bat-' + str(batch_size) + 
+            #           '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
+            #           '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
+            #           '.pdf',bbox_inches='tight')
             # plt.clf()
 
 class NeuralNetwork:
@@ -166,6 +166,8 @@ class NeuralNetwork:
             # divide by number of incoming batch size to regularize
             dE_dWeight = (-np.dot(-dE_dH,self.layers[-1].weight_der) / \
                           self.layers[-1].weight_der.shape[0])
+
+            print(dE_dWeight)
 
             # do not include the bias weights--not needed and will be updated later 
             dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) * self.reg 
