@@ -1,0 +1,51 @@
+Layer with 1 hidden network (300 neurons). Epochs 
+mo-0.0-eta-0.4
+Percent Correct: 94.13%
+Run-time: 1083.04311395 seconds
+
+mo-0.0-eta-0.7
+Percent Correct: 94.72%
+Run-time: 1078.50167799 seconds
+
+mo-0.0-eta-0.9
+Percent Correct: 94.82%
+Run-time: 1076.73657393 seconds
+
+mo-0.8-eta-0.4
+Percent Correct: 95.61%
+Run-time: 1076.8610909 seconds
+
+mo-0.8-eta-0.7
+Percent Correct: 96.27%
+Run-time: 1077.98965693 seconds
+
+mo-0.8-eta-0.9
+Percent Correct: 96.89%
+Run-time: 1079.15961313 seconds
+
+
+Layer with 2 hidden networks (300 and 100 neurons respectively).
+mo-0.0-eta-0.4
+Percent Correct: 89.74%
+Run-time: 1220.183357 seconds
+
+mo-0.0-eta-0.7
+Percent Correct: 90.68%
+Run-time: 1221.12571001 seconds
+
+mo-0.0-eta-0.9
+Percent Correct: 91.56%
+Run-time: 1220.0601058 seconds
+
+mo-0.8-eta-0.4
+Percent Correct: 92.22%
+Run-time: 1220.07663107 seconds
+
+mo-0.8-eta-0.7
+Percent Correct: 93.34%
+Run-time: 1222.40497899 seconds
+
+mo-0.8-eta-0.9
+Percent Correct: 93.88%
+Run-time: 1224.18042397 seconds
+

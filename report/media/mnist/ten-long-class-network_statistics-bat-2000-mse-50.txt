@@ -1,0 +1,7 @@
+Layer with 1 hidden network (300 neurons). Epochs 
+mo-0.8-eta-0.9
+Percent Correct: 92.92%
+Run-time: 1182.03098607 seconds
+
+
+Layer with 2 hidden networks (300 and 100 neurons respectively).

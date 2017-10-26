@@ -1,0 +1,1 @@
+Layer with 1 hidden network (300 neurons). Epochs 

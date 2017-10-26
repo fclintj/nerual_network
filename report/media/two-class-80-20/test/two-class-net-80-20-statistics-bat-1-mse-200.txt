@@ -1,0 +1,5 @@
+Two class layer with 1 hidden network (5 neurons). Epochs 
+mo-0.0-eta-0.4
+Percent Correct: 92.5%
+Run-time: 1.52829384804 seconds
+

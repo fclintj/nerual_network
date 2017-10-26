@@ -1,0 +1,51 @@
+Two class layer with 1 hidden network (5 neurons). Epochs 
+mo-0.0-eta-0.4
+Percent Correct: 92.5%
+Run-time: 0.560807943344 seconds
+
+mo-0.0-eta-0.7
+Percent Correct: 92.5%
+Run-time: 0.569748878479 seconds
+
+mo-0.0-eta-0.9
+Percent Correct: 92.5%
+Run-time: 0.778621912003 seconds
+
+mo-0.8-eta-0.4
+Percent Correct: 92.5%
+Run-time: 0.594919204712 seconds
+
+mo-0.8-eta-0.7
+Percent Correct: 92.5%
+Run-time: 0.717699050903 seconds
+
+mo-0.8-eta-0.9
+Percent Correct: 92.5%
+Run-time: 0.587964057922 seconds
+
+
+Two class layer with 2 hidden networks (5 and 10 neurons respectively).
+mo-0.0-eta-0.4
+Percent Correct: 92.5%
+Run-time: 0.685973882675 seconds
+
+mo-0.0-eta-0.7
+Percent Correct: 92.5%
+Run-time: 0.68302488327 seconds
+
+mo-0.0-eta-0.9
+Percent Correct: 92.5%
+Run-time: 0.728396892548 seconds
+
+mo-0.8-eta-0.4
+Percent Correct: 92.5%
+Run-time: 0.695672035217 seconds
+
+mo-0.8-eta-0.7
+Percent Correct: 92.5%
+Run-time: 0.681930780411 seconds
+
+mo-0.8-eta-0.9
+Percent Correct: 92.5%
+Run-time: 0.666880846024 seconds
+
