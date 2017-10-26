@@ -21,7 +21,7 @@ __init__	deepnn_two_class.py	/^    def __init__(self, layers, softmax=True, mome
 __init__	deepnn_two_class.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	deepnn_two_class.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __init__	test_output.py	/^    def __init__(self, data0, data1):$/;"	m	class:data_frame
-__init__	test_output.py	/^    def __init__(self, layers, softmax=True, momentum=0, eta=0.1, MSE_freq=50):$/;"	m	class:NeuralNetwork
+__init__	test_output.py	/^    def __init__(self, layers, softmax=True, momentum=0, eta=0.7, MSE_freq=50):$/;"	m	class:NeuralNetwork
 __init__	test_output.py	/^    def __init__(self,function,derivative):$/;"	m	class:activation_function
 __init__	test_output.py	/^    def __init__(self,num_inputs,num_neurons, activation):$/;"	m	class:layer
 __set_GRV_starting_weights	deepnn.py	/^    def __set_GRV_starting_weights(self):$/;"	m	class:NeuralNetwork	file:
@@ -64,11 +64,9 @@ gendata2	deepnn.py	/^def gendata2(class_type,N):$/;"	f
 gendata2	deepnn2.py	/^def gendata2(class_type,N):$/;"	f
 gendata2	deepnn_two_class.py	/^def gendata2(class_type,N):$/;"	f
 gendata2	test_output.py	/^def gendata2(class_type,N):$/;"	f
-get_2_class_data	deepnn.py	/^def get_2_class_data():$/;"	f
 get_2_class_data	deepnn2.py	/^def get_2_class_data():$/;"	f
 get_2_class_data	deepnn_two_class.py	/^def get_2_class_data():$/;"	f
 get_2_class_data	test_output.py	/^def get_2_class_data():$/;"	f
-get_3_class_data	deepnn.py	/^def get_3_class_data():$/;"	f
 get_3_class_data	deepnn2.py	/^def get_3_class_data():$/;"	f
 get_3_class_data	deepnn_two_class.py	/^def get_3_class_data():$/;"	f
 get_3_class_data	test_output.py	/^def get_3_class_data():$/;"	f
@@ -92,7 +90,6 @@ get_ordered_digits	deepnn.py	/^def get_ordered_digits(X_train):$/;"	f
 get_ordered_digits	deepnn2.py	/^def get_ordered_digits(X_train):$/;"	f
 get_ordered_digits	deepnn_two_class.py	/^def get_ordered_digits(X_train):$/;"	f
 get_ordered_digits	test_output.py	/^def get_ordered_digits(X_train):$/;"	f
-get_sprial_class_data	deepnn.py	/^def get_sprial_class_data():$/;"	f
 get_sprial_class_data	deepnn2.py	/^def get_sprial_class_data():$/;"	f
 get_sprial_class_data	deepnn_two_class.py	/^def get_sprial_class_data():$/;"	f
 get_sprial_class_data	test_output.py	/^def get_sprial_class_data():$/;"	f
@@ -132,7 +129,6 @@ return_value	deepnn.py	/^def return_value(X):$/;"	f
 return_value	deepnn2.py	/^def return_value(X):$/;"	f
 return_value	deepnn_two_class.py	/^def return_value(X):$/;"	f
 return_value	test_output.py	/^def return_value(X):$/;"	f
-set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:NeuralNetwork
 set_initial_conditions	deepnn.py	/^    def set_initial_conditions(self):$/;"	m	class:layer
 set_initial_conditions	deepnn2.py	/^    def set_initial_conditions(self):$/;"	m	class:NeuralNetwork
 set_initial_conditions	deepnn2.py	/^    def set_initial_conditions(self):$/;"	m	class:layer
@@ -148,7 +144,6 @@ sigmoid_func	deepnn.py	/^def sigmoid_func(x):$/;"	f
 sigmoid_func	deepnn2.py	/^def sigmoid_func(x):$/;"	f
 sigmoid_func	deepnn_two_class.py	/^def sigmoid_func(x):$/;"	f
 sigmoid_func	test_output.py	/^def sigmoid_func(x):$/;"	f
-softmax_func	deepnn.py	/^def softmax_func(x):$/;"	f
 softmax_func	deepnn2.py	/^def softmax_func(x):$/;"	f
 softmax_func	deepnn_two_class.py	/^def softmax_func(x):$/;"	f
 softmax_func	test_output.py	/^def softmax_func(x):$/;"	f

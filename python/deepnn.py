@@ -12,7 +12,7 @@ def main():
     num_inputs = 784 
     num_outputs= 10 
     batch_size = 100
-    epochs = 10
+    epochs = 30
     mse_freq = 50
 
     # open mnist data
@@ -34,14 +34,14 @@ def main():
     layers1.append(layer(100,num_outputs,no_activation))
 
     # set up test bench
-    layer_testbench = [layers0,layers1] 
+    layer_testbench = [layers0] 
     message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
                 "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
     momentum_values = [0.0,0.8]
     step_size = [0.4,0.7,0.9]
 
-    file = open('../report/media/mnist/ten-long-class-network_statistics-bat-' 
+    file = open('../report/media/mnist/test/ten-long-class-network_statistics-bat-' 
             + str(batch_size) + 
             '-mse-' + str(mse_freq) + '.txt',"w") 
 
@@ -61,8 +61,10 @@ def main():
                 end_time = time.time()
 
                 # classify data
-                Yhat = network.classify_data(X_test)
-                training_accuracy = network.validate_results(Yhat,Y_test) 
+                Yhat = network.classify_data(X)
+                Yhat_test = network.classify_data(X_test)
+                training_accuracy = network.validate_results(Yhat,Y) 
+                training_accuracy = network.validate_results(Yhat_test,Y_test) 
                  
                 # write statistics
                 file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
@@ -75,7 +77,7 @@ def main():
             # save combined error plot
             plt.title("MSE for Momentum= " + str(mom) + 
                       ", Step=" + str(step_size))
-            plt.savefig('../report/media/mnist/ten-c-bat-' + str(batch_size) + 
+            plt.savefig('../report/media/mnist/test/ten-c-bat-' + str(batch_size) + 
                       '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                       '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                       '.pdf',bbox_inches='tight')
@@ -141,33 +143,18 @@ class NeuralNetwork:
     def train_data(self, X, Y):
         Yhat = self.forward_prop(X)
         dE_dH = (Yhat-Y).T
-        iterlayers = iter(self.layers[::-1])
 
         # back propagation
         if self.softmax is True:
-            # divide by number of incoming batch size to regularize
-            dE_dWeight = (-np.dot(-dE_dH,self.layers[-1].weight_der) / \
-                          self.layers[-1].weight_der.shape[0])
+            self.layers[-1].output = np.ones(dE_dH.shape).T
 
-            # do not include the bias weights--not needed and will be updated later 
-            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) * self.reg 
-                    # Yhat.shape[0]
-
-            # update current weights with momentum
-            self.layers[-1].W += -self.eta*(dE_dWeight + \
-                    self.momentum*self.layers[-1].momentum_matrix)
-            self.layers[-1].momentum_matrix = dE_dWeight
-
-            # skip the last layer if softmax
-            next(iterlayers) 
-
-        for layer in iterlayers:
+        for layer in self.layers[::-1]:
             dE_dNet = layer.der(layer.output).T*dE_dH
             dE_dWeight = (np.dot(dE_dNet,layer.weight_der)) / \
                 layer.weight_der.shape[0]
 
+            # obtain multiplication to pass back to next layer
             dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet) * self.reg 
-                    # Yhat.shape[0]
 
             layer.W += -layer.momentum_matrix
             layer.momentum_matrix = \
@@ -221,7 +208,7 @@ class NeuralNetwork:
         self.layers[-1].num_outputs = self.num_outputs
 
         for layer in self.layers:
-            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_outputs)) 
+            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_neurons)) 
             layer.W = np.random.normal(0,sigma,layer.W.shape)
         
 class layer:
@@ -258,29 +245,6 @@ class activation_function:
 
     def derivative(self,x):
         return self.derivative(x) 
-
-class data_frame:
-    def __init__(self, data0, data1):
-        self.x0 = data0 
-        self.x1 = data1 
-        self.xtot = np.r_[self.x0,self.x1]
-        self.N0 = self.x0.shape[0]
-        self.N1 = self.x1.shape[0]
-        self.N = self.N0 + self.N1
-        self.xlim = [np.min(self.xtot[:,0]),np.max(self.xtot[:,0])]
-        self.ylim = [np.min(self.xtot[:,1]),np.max(self.xtot[:,1])]
-        class_x0 = np.c_[np.zeros([self.N0,1]),np.ones([self.N0,1])] 
-        class_x1 = np.c_[np.ones([self.N1,1]),np.zeros([self.N1,1])] 
-        self.class_tot = np.r_[class_x0,class_x1]
-        self.y = np.r_[np.ones([self.N0,1]),np.zeros([self.N1,1])] 
-        
-        # create a training set from the classasgntrain1.dat (80% and 20%)
-        self.train_x0 = data0[0:80]
-        self.train_x1 = data1[0:80]
-        self.train_tot = np.r_[data0[0:80],data1[0:80]]
-        self.train_class_tot = np.r_[self.class_tot[0:80],self.class_tot[100:180]]
-        self.test_data = np.r_[data0[80:100],data1[80:100]]
-        self.test_class_tot = np.r_[self.class_tot[80:100],self.class_tot[180:200]]
 
 def print_digits(X,ordered,m,n):
     f, ax = plt.subplots(m,n)
@@ -357,6 +321,29 @@ def get_moon_gendata():
     x1 = gendata2(1,10000)
     data = data_frame(x0,x1)
     return data.xtot, data.class_tot 
+
+class data_frame:
+    def __init__(self, data0, data1):
+        self.x0 = data0 
+        self.x1 = data1 
+        self.xtot = np.r_[self.x0,self.x1]
+        self.N0 = self.x0.shape[0]
+        self.N1 = self.x1.shape[0]
+        self.N = self.N0 + self.N1
+        self.xlim = [np.min(self.xtot[:,0]),np.max(self.xtot[:,0])]
+        self.ylim = [np.min(self.xtot[:,1]),np.max(self.xtot[:,1])]
+        class_x0 = np.c_[np.zeros([self.N0,1]),np.ones([self.N0,1])] 
+        class_x1 = np.c_[np.ones([self.N1,1]),np.zeros([self.N1,1])] 
+        self.class_tot = np.r_[class_x0,class_x1]
+        self.y = np.r_[np.ones([self.N0,1]),np.zeros([self.N1,1])] 
+        
+        # create a training set from the classasgntrain1.dat (80% and 20%)
+        self.train_x0 = data0[0:80]
+        self.train_x1 = data1[0:80]
+        self.train_tot = np.r_[data0[0:80],data1[0:80]]
+        self.train_class_tot = np.r_[self.class_tot[0:80],self.class_tot[100:180]]
+        self.test_data = np.r_[data0[80:100],data1[80:100]]
+        self.test_class_tot = np.r_[self.class_tot[80:100],self.class_tot[180:200]]
 
 def get_classasgn_80_20():
     data = np.loadtxt("./data/classasgntrain1.dat",dtype=float)

@@ -11,12 +11,14 @@ import time
 def main():
     num_inputs = 2 
     num_outputs= 2
-    batch_size = 1 
-    epochs = 600
-    mse_freq = 2000
+    batch_size = 1 # not used. All data used
+    epochs = 2000
+    mse_freq = 200
 
     # open mnist data
     X,Y,X_test,Y_test = get_classasgn_80_20()
+    # Y = Y[:,1].reshape(-1,1)
+    # Y_test = Y_test[:,1].reshape(-1,1)
 
     # initialize activation functions
     relu = activation_function(relu_func,relu_der)
@@ -27,10 +29,9 @@ def main():
     layers0 = [layer(num_inputs,5,sig)]
     layers0.append(layer(5,num_outputs,sig))
 
-    # second layer tests 
     layers1 = [layer(num_inputs,5,sig)]
     layers1.append(layer(5,10,sig))
-    layers1.append(layer(10,num_outputs,sig))
+    layers1.append(layer(5,num_outputs,sig)) 
 
     layer_testbench = [layers0,layers1] 
 
@@ -40,7 +41,7 @@ def main():
     momentum_values = [0.0,0.8]
     step_size = [0.4,0.7,0.9]
 
-    file = open('../report/media/two-class-80-20/two-class-net-80-20-statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
+    file = open('../report/media/two-class-80-20/test/two-class-net-80-20-statistics-bat-' + str(batch_size) + '-mse-' + str(mse_freq) + '.txt',"w") 
 
     for index, layers in enumerate(layer_testbench):
         file.write(message[index])
@@ -50,7 +51,7 @@ def main():
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
 
                 # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom) 
+                network = NeuralNetwork(layers,eta=step,momentum=mom,softmax=False) 
 
                 # train network
                 start_time = time.time()
@@ -69,15 +70,18 @@ def main():
                 # plot data points and graph boundaries
                 plt.figure(1)
                 plt.clf()
-                plot_data(X[0:100],X[100:200]) 
+                plot_data(X_test[0:20],X_test[20:40]) 
+
                 xtot = np.r_[X,X_test] 
                 xlim = [np.min(xtot[:,0]),np.max(xtot[:,0])]
                 ylim = [np.min(xtot[:,1]),np.max(xtot[:,1])]
+
                 plot_boundaries(xlim,ylim,network.classify_data)
-                plt.savefig('../report/media/two-class-80-20/two-c-net-80-20-bat-' + str(batch_size) + 
+                plt.savefig('../report/media/two-class-80-20/test/two-c-net-80-20-bat-' + str(batch_size) + 
                         '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                         '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                         '.pdf',bbox_inches='tight')
+                plt.show()
                 plt.clf()
 
                 plt.figure(2)
@@ -91,6 +95,7 @@ def main():
                       '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
                       '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
                       '.pdf',bbox_inches='tight')
+            plt.show()
             plt.clf()
 
 class NeuralNetwork:
@@ -151,7 +156,8 @@ class NeuralNetwork:
         completed_epocs = 0
         for i in range(total_itrs):
             batch = np.random.randint(0,X.shape[0],batch_size)
-            # self.train_data(X[batch],Y[batch]) 
+            self.train_data(X[batch],Y[batch]) 
+            
             self.train_data(X,Y) 
             if i%print_frequency is 0:
                 print("Iteration %d MSE: %f"%(i+1, np.mean(self.error_array[-self.MSE_freq:])))
@@ -176,11 +182,12 @@ class NeuralNetwork:
                           self.layers[-1].weight_der.shape[0])
 
             # do not include the bias weights--not needed and will be updated later 
-            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) * self.reg 
+            dE_dH = np.dot(self.layers[-1].W[:,0:-1].T,dE_dH) 
 
             # update current weights with momentum
             self.layers[-1].W += -self.eta*(dE_dWeight + \
                     self.momentum*self.layers[-1].momentum_matrix)
+
             self.layers[-1].momentum_matrix = dE_dWeight
 
             # skip the last layer if softmax
@@ -191,7 +198,7 @@ class NeuralNetwork:
             dE_dWeight = (np.dot(dE_dNet,layer.weight_der)) / \
                 layer.weight_der.shape[0]
 
-            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet) * self.reg 
+            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet)
 
             layer.W += -layer.momentum_matrix
             layer.momentum_matrix = \
