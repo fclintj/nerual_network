@@ -1,1 +1,12 @@
+\contentsline {figure}{\numberline {1}{\ignorespaces 10 Digits from the MNIST Data-set\relax }}{1}{figure.caption.2}
+\contentsline {figure}{\numberline {2}{\ignorespaces Trained Output for 80\% Training Data, 20\% Testing Data with 0.0 Momentum\relax }}{4}{figure.caption.3}
+\contentsline {figure}{\numberline {3}{\ignorespaces Trained Output for 80\% Training Data, 20\% Testing Data with 0.8 Momentum\relax }}{4}{figure.caption.4}
+\contentsline {figure}{\numberline {4}{\ignorespaces Three Miss-classified Points\relax }}{5}{figure.caption.5}
+\contentsline {figure}{\numberline {5}{\ignorespaces Trained Output for 80\% Training Data, 20\% Testing Data with 0.8 Momentum and an Additional Layer with 10 Neurons\relax }}{5}{figure.caption.6}
+\contentsline {figure}{\numberline {6}{\ignorespaces Comparison of Two-class Classifier with 0.0 Momentum\relax }}{7}{figure.caption.8}
+\contentsline {figure}{\numberline {7}{\ignorespaces Comparison of Two-class Classifier with 0.8 Momentum and an Additional Layer\relax }}{7}{figure.caption.9}
+\contentsline {figure}{\numberline {8}{\ignorespaces Comparison of Differing Momentum with a Single Hidden Layer\relax }}{8}{figure.caption.11}
+\contentsline {figure}{\numberline {9}{\ignorespaces Comparing the Mean Square Error with Momentum 0.0 and 0.8 \relax }}{9}{figure.caption.12}
+\contentsline {figure}{\numberline {10}{\ignorespaces Comparing the Mean Square Error with Momentum 0.0 and 0.8 with an Additional Layer\relax }}{9}{figure.caption.13}
+\contentsfinish 
 \contentsfinish 

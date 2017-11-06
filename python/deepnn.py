@@ -10,7 +10,7 @@ import time
 
 def main():
     num_inputs = 784 
-    num_outputs= 10 
+    num_outputs= 10
     batch_size = 100
     epochs = 30
     mse_freq = 50
@@ -22,8 +22,8 @@ def main():
     relu = activation_function(relu_func,relu_der)
     sig  = activation_function(sigmoid_func,sigmoid_der)
     no_activation = activation_function(return_value,return_value)
-    
-    num_neurons = 300 
+
+    num_neurons = 300
     # first layer tests
     layers0 = [layer(num_inputs,num_neurons,relu)]
     layers0.append(layer(num_neurons,num_outputs,no_activation))
@@ -34,16 +34,16 @@ def main():
     layers1.append(layer(100,num_outputs,no_activation))
 
     # set up test bench
-    layer_testbench = [layers0] 
+    layer_testbench = [layers0]
     message = ["Layer with 1 hidden network (300 neurons). Epochs " +  "\n",
                 "\nLayer with 2 hidden networks (300 and 100 neurons respectively).\n"]
 
     momentum_values = [0.0,0.8]
     step_size = [0.4,0.7,0.9]
 
-    file = open('../report/media/mnist/test/ten-long-class-network_statistics-bat-' 
-            + str(batch_size) + 
-            '-mse-' + str(mse_freq) + '.txt',"w") 
+    file = open('../report/media/mnist/test/ten-long-class-network_statistics-bat-'
+            + str(batch_size) +
+            '-mse-' + str(mse_freq) + '.txt',"w")
 
     for index, layers in enumerate(layer_testbench):
         file.write(message[index])
@@ -52,7 +52,7 @@ def main():
                 print("Currently on layer " + str(index) + " momentum " + str(mom) + " step size " + str(step))
 
                 # create neural network
-                network = NeuralNetwork(layers,eta=step,momentum=mom) 
+                network = NeuralNetwork(layers,eta=step,momentum=mom)
 
                 # train network
                 start_time = time.time()
@@ -63,39 +63,40 @@ def main():
                 # classify data
                 Yhat = network.classify_data(X)
                 Yhat_test = network.classify_data(X_test)
-                training_accuracy = network.validate_results(Yhat,Y) 
-                training_accuracy = network.validate_results(Yhat_test,Y_test) 
-                 
+                training_accuracy = network.validate_results(Yhat,Y)
+                training_accuracy = network.validate_results(Yhat_test,Y_test)
+
                 # write statistics
                 file.write('mo-' + str(mom) + '-eta-' + str(step) + "\n")
                 file.write("Percent Correct: " + str(training_accuracy) + "%\n")
                 file.write("Run-time: " + str(end_time-start_time) +" seconds" + "\n\n")
 
                 # plot error
-                network.plot_error(index,mom,step)    
-                 
+                network.plot_error(index,mom,step)
+
             # save combined error plot
-            plt.title("MSE for Momentum= " + str(mom) + 
+            plt.title("MSE for Momentum= " + str(mom) +
                       ", Step=" + str(step_size))
-            plt.savefig('../report/media/mnist/test/ten-c-bat-' + str(batch_size) + 
-                      '-mse-' + str(mse_freq) + '-lay-' + str(index) + 
-                      '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) + 
+            plt.savefig('../report/media/mnist/test/ten-c-bat-' + str(batch_size) +
+                      '-mse-' + str(mse_freq) + '-lay-' + str(index) +
+                      '-mo-' + str(int(mom*10)) + '-eta-' + str(int(step*10)) +
                       '.pdf',bbox_inches='tight')
             plt.clf()
 
+
 class NeuralNetwork:
-    def __init__(self, layers, softmax=True, momentum=0, 
+    def __init__(self, layers, softmax=True, momentum=0,
                  eta=0.1, MSE_freq=50, reg=0.001):
         self.num_layers  = len(layers)
         self.num_outputs = layers[self.num_layers-1].num_neurons
-        self.error_array = [] 
-        self.error_plot  = [] 
+        self.error_array = []
+        self.error_plot  = []
         self.momentum = momentum
         self.MSE_freq = MSE_freq
         self.softmax= softmax
         self.layers = layers
         self.reg = reg
-        self.eta = eta 
+        self.eta = eta
         self.__set_GRV_starting_weights()
 
     def train_network(self, X, Y, batch_size=100, epochs=100, MSE_freq=50):
@@ -115,19 +116,19 @@ class NeuralNetwork:
             print_frequency = total_itrs/10
             if print_frequency is 0:
                 print_frequency += 1 # to avoid modulo by zero
-        
+
         completed_epocs = 0
         for i in range(total_itrs):
             # randomly select samples from input data for batch
             batch = np.random.randint(0,X.shape[0],batch_size)
-            self.train_data(X[batch],Y[batch]) 
+            self.train_data(X[batch],Y[batch])
             if i%itrs_per_epoch is 0:
-                print("Epoch %d. MSE: %f"%(completed_epocs, 
+                print("Epoch %d. MSE: %f"%(completed_epocs,
                     np.mean(self.error_array[-self.MSE_freq:])))
-                completed_epocs += 1 
+                completed_epocs += 1
 
             if i%print_frequency is 0:
-                print("Iteration %d MSE: %f"%(i+1, 
+                print("Iteration %d MSE: %f"%(i+1,
                     np.mean(self.error_array[-self.MSE_freq:])))
 
 
@@ -150,17 +151,21 @@ class NeuralNetwork:
 
         for layer in self.layers[::-1]:
             dE_dNet = layer.der(layer.output).T*dE_dH
+
+            # divide by number of samples in batch to regularize step
             dE_dWeight = (np.dot(dE_dNet,layer.weight_der)) / \
-                layer.weight_der.shape[0]
+                of layer.weight_der.shape[0]
 
             # obtain multiplication to pass back to next layer
-            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet) * self.reg 
+            dE_dH = np.dot(layer.W[:,0:-1].T,dE_dNet) * self.reg
 
+            # update weight matrix with momentum
             layer.W += -layer.momentum_matrix
             layer.momentum_matrix = \
                     self.momentum * layer.momentum_matrix + \
                     self.eta * dE_dWeight
 
+        # create long entire list of errors to plot at specific frequency later
         for indx,yhat in enumerate(Yhat):
             self.error_array.append(sum((Y[indx]-yhat)*(Y[indx]-yhat)))
 
@@ -169,12 +174,12 @@ class NeuralNetwork:
         for layer in self.layers:
             prev_out = np.c_[prev_out,np.ones([prev_out.shape[0],1])]
             prev_out = layer.forward(prev_out)
-        
+
         if self.softmax is True:
             self.layers[-1].output = self.stable_softmax(self.layers[-1].net)
 
-        return self.layers[-1].output 
-         
+        return self.layers[-1].output
+
     def classify_data(self, X):
         Yhat = self.forward_prop(X)
         class_type = np.argmax(Yhat,axis=1)
@@ -191,7 +196,7 @@ class NeuralNetwork:
         training_accuracy = (len(Yhat)-num_err)/len(Yhat)*100
         print("%d Mistakes. Training Accuracy: %.2f%%"%(int(num_err),training_accuracy))
         return training_accuracy
-        
+
     def plot_error(self,index,momentum,eta):
         plt.plot(range(len(self.error_plot)), self.error_plot)
         plt.xlabel("Mean set for %d Training Samples"%(self.MSE_freq))
@@ -208,9 +213,9 @@ class NeuralNetwork:
         self.layers[-1].num_outputs = self.num_outputs
 
         for layer in self.layers:
-            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_neurons)) 
+            sigma = np.sqrt(float(2) / (layer.num_inputs + layer.num_neurons))
             layer.W = np.random.normal(0,sigma,layer.W.shape)
-        
+
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
         self.W = np.random.uniform(0,1,[num_neurons,num_inputs+1])
@@ -221,11 +226,11 @@ class layer:
         self.num_outputs = None
         self.weight_der  = None
         self.net    = None
-        self.output = None  
-    
+        self.output = None
+
     def forward(self, X):
         self.weight_der = X
-        self.net = np.dot(X, self.W.T) 
+        self.net = np.dot(X, self.W.T)
         self.output = self.activation.function(self.net)
         return self.output
 
@@ -241,10 +246,10 @@ class activation_function:
         self.derivative = derivative
 
     def function(self,x):
-        return self.function(x) 
+        return self.function(x)
 
     def derivative(self,x):
-        return self.derivative(x) 
+        return self.derivative(x)
 
 def print_digits(X,ordered,m,n):
     f, ax = plt.subplots(m,n)
@@ -264,7 +269,7 @@ def sigmoid_der(x):
 
 def relu_func(X):
     return np.maximum(0,X)
-    
+
 def relu_der(X):
     X[X<0]=0
     return X
@@ -290,12 +295,12 @@ def gendata2(class_type,N):
             m = m1[:,idx]
         else:
             print("not a proper classifier")
-            return 0 
+            return 0
         x = np.c_[x, [[m[0]],[m[1]]] + np.random.randn(2,1)/np.sqrt(5)]
     return x.T
 
 def get_ordered_digits(X_train):
-    ordered = [ 
+    ordered = [
             X_train[7] , # 0 
             X_train[4] , # 1 
             X_train[16], # 2
@@ -306,7 +311,7 @@ def get_ordered_digits(X_train):
             X_train[14], # 7 
             X_train[5] , # 8 
             X_train[8] , # 9
-            ]       
+            ]
     return ordered
 
 def get_moon_class_data():

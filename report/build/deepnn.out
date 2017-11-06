@@ -1,4 +1,10 @@
 \BOOKMARK [1][-]{section.1}{Summary}{}% 1
 \BOOKMARK [1][-]{section.2}{Program\040Description}{}% 2
 \BOOKMARK [1][-]{section.3}{Two-class\040Classifier}{}% 3
-\BOOKMARK [1][-]{section.4}{Ten-class\040Classifier}{}% 4
+\BOOKMARK [2][-]{subsection.3.1}{Increasing\040Network\040Complexity}{section.3}% 4
+\BOOKMARK [2][-]{subsection.3.2}{Comparing\040a\040Neural\040Network\040to\040Other\040Classifiers}{section.3}% 5
+\BOOKMARK [1][-]{section.4}{Ten-class\040Classifier}{}% 6
+\BOOKMARK [2][-]{subsection.4.1}{Increasing\040the\040Complexity\040of\040the\040MNIST\040Neural\040Network}{section.4}% 7
+\BOOKMARK [1][-]{section.5}{Appendix}{}% 8
+\BOOKMARK [2][-]{subsection.5.1}{ten-class-classifier.py}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.2}{two-class-classifier.py}{section.5}% 10

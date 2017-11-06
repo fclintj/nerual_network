@@ -236,7 +236,7 @@ class NeuralNetwork:
         self.layers[0].W[0,:] = [0.1,0.1,0.01]
         self.layers[0].W[1,:] = [0.2,0.2,0.1 ]
         self.layers[0].W[2,:] = [0.3,0.3,0.1 ]
-        
+
 class layer:
     def __init__(self,num_inputs,num_neurons, activation):
         self.num_neurons = num_neurons
